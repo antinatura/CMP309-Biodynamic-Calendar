@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         // month change backward for this seems unnecessary
 
         // gotta also do something about the lifecycle
+        // add menu with app info, user info + maybe language and theme change buttons
     }
 
     // syntax can be changed? from the library: calendar.add(Calendar.DAY_OF_MONTH, 10);
@@ -108,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
             requestQueue.add(stringRequest);
         }
 
-        CalendarView calendarView = (CalendarView) findViewById(R.id.calendarView);
+        CalendarView calendarView = findViewById(R.id.calendarView);
         calendarView.setEvents(events);
     }
 
