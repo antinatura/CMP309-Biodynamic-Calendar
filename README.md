@@ -18,7 +18,7 @@ Widgets.
 > * At least 3 unique screens/pages and utilising different layouts, views and UI widgets.
 >   - These can be implemented using Activities, Fragments, Tabs, Navigation Drawer or Popup Dialogs.
 > * Appropriate handling of application lifecycle and user input.
->  - Consider lifecycle callback functions, orientation handling and data persistence.
+>   - Consider lifecycle callback functions, orientation handling and data persistence.
 > * At least one example of each: data storage AND connectivity.
 >   - For data storage you can use Local File Storage, SQLite Databases, Cloud Storage or Shared
 Preferences (if used extensively).
