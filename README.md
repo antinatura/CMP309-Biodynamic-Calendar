@@ -30,10 +30,10 @@ Android/Google API).
 and management, file sizes, data usage, authentication and effect of the app on battery life.
 >   - You can also research and implement appropriate app accessibility features such as alternative
 themes, localisation, voice assistant, etc.
-
+>
 > If you’d like to use a feature not listed above, please discuss it with the module tutor. Extra
 credit will be given for correct implementation of features not explicitly covered in class.
-
+>
 > Your application must run on an Android device or emulator. It is highly recommended that you
 use API level 29 or Higher. If you would like to use an older device running older version of
 Android, please discuss this with the module tutor. You may use external libraries, provided these
