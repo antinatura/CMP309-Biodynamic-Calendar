@@ -3,7 +3,6 @@ package uk.ac.abertay.biodynamiccalendar;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.widget.TextView;
@@ -11,6 +10,7 @@ import android.widget.TextView;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -87,5 +87,7 @@ public class DayActivity extends AppCompatActivity {
         // Add the request to the RequestQueue
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
         requestQueue.add(stringRequest);
+
+        // FirebaseFirestore db = FirebaseFirestore.getInstance();
     }
 }

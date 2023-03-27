@@ -4,6 +4,6 @@
         <bitmap
             android:gravity="top|left"
             android:tint="@android:color/holo_orange_light"
-            android:src="@drawable/dot" />
+            android:src="@drawable/fruit" />
     </item>
 </layer-list>
