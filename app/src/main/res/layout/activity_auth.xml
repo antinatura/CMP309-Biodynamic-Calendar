@@ -4,15 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/splash"
-    tools:context=".SplashActivity">
+    tools:context=".AuthActivity">
 
-    <ProgressBar
-        android:id="@+id/loadingBar"
-        android:indeterminateTint="@color/purple_200"
+    <com.google.android.gms.common.SignInButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/google_auth"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="175dp" />
-
+        android:layout_marginBottom="175dp"/>
 </RelativeLayout>
