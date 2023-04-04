@@ -1,21 +1,25 @@
 package uk.ac.abertay.biodynamiccalendar;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -26,15 +30,17 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class DayActivity extends AppCompatActivity {
 
+    FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_day);
 
-        // FirebaseFirestore db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
 
         // get variables from extras
         String[] extras = this.getIntent().getStringArrayExtra("extras");
@@ -44,7 +50,6 @@ public class DayActivity extends AppCompatActivity {
         Button submit = findViewById(R.id.submit);
 
         formatDay(extras);
-
         getNote(date);
 
         submit.setOnClickListener(view -> {
@@ -59,7 +64,8 @@ public class DayActivity extends AppCompatActivity {
 
     private void getNote(String dateDoc){
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference dbNotes = db.document("..." + dateDoc);
+        String uid = Objects.requireNonNull(mAuth.getCurrentUser()).getUid(); // ?
+        DocumentReference dbNotes = db.document("/users/" + uid + "/notes/" + dateDoc);
 
         dbNotes.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -74,7 +80,8 @@ public class DayActivity extends AppCompatActivity {
 
     private void addNote(String dateDoc, String note) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference dbNotes = db.document("..." + dateDoc);
+        String uid = Objects.requireNonNull(mAuth.getCurrentUser()).getUid(); // ?
+        DocumentReference dbNotes = db.document("/users/" + uid + "/notes/" + dateDoc);
         Map<String, Object> docData = new HashMap<>();
         docData.put("note", note);
 
@@ -84,7 +91,7 @@ public class DayActivity extends AppCompatActivity {
     }
 
     private void formatDay(String[] extras) {
-        // will be passing all the day type stuff as with intents after as the main activity handles API too now
+        // will be passing all the day type stuff as with intents after as the main activity handles API now
         String iso8601 = extras[0] + extras[1] + extras[2] + "T100000"; // iso8601 timestamp for the API call
         // locations will be used from db
         String latitude = "56.462002";
@@ -99,7 +106,7 @@ public class DayActivity extends AppCompatActivity {
         // API query
         String url = "https://api.visibleplanets.dev/v3?latitude=" + latitude + "&longitude=" + longitude + "&aboveHorizon=false&time=" + iso8601;
 
-        // Make API request
+        // Make an API request with volley
         StringRequest stringRequest = new StringRequest(url, response -> {
             try {
                 JSONObject responseObject = new JSONObject(response);
@@ -109,30 +116,7 @@ public class DayActivity extends AppCompatActivity {
                 String constValue = moonArray.getString("constellation");
                 constellation.append(constValue);
 
-                // basic testing code, this will move
-                // make a 2d array with the day types corresponding to constellations?
-                String[] constArray = {"Capricornus","Taurus", "Virgo", "Gemini", "Libra", "Aquarius", "Pisces", "Scorpius", "Cancer", "Ophiuchus", "Aries", "Sagittarius", "Leo"};
-                ActionBar actionBar = getSupportActionBar();
-                ColorDrawable colorDrawable;
-
-                for (int i = 0; i < constArray.length; i++) {
-                    if (constArray[i].equals(constValue)) {
-                        // decide on colors and put them in colors.xml
-                        if (i <= 2) {
-                            colorDrawable = new ColorDrawable(this.getColor(R.color.root));
-                        } else if (i <= 5) {
-                            colorDrawable = new ColorDrawable(this.getColor(R.color.flower));
-                        } else if (i <= 9) {
-                            colorDrawable = new ColorDrawable(this.getColor(R.color.leaf));
-                        } else {
-                            colorDrawable = new ColorDrawable(this.getColor(R.color.fruit));
-                        }
-                        if (actionBar != null) {
-                            actionBar.setBackgroundDrawable(colorDrawable);
-                        }
-                        break;
-                    }
-                }
+                colorToolbar(constValue);
 
             }  catch (JSONException e) {
                 e.printStackTrace();
@@ -144,5 +128,36 @@ public class DayActivity extends AppCompatActivity {
         // Add the request to the RequestQueue
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
         requestQueue.add(stringRequest);
+    }
+
+    private void colorToolbar(String constValue) {
+        String[] constArray = {"Capricornus","Taurus", "Virgo", "Gemini", "Libra", "Aquarius", "Pisces", "Scorpius", "Cancer", "Ophiuchus", "Aries", "Sagittarius", "Leo"};
+        LinearLayout toolbar = findViewById(R.id.toolbar2);
+        int color;
+
+        for (int i = 0; i < constArray.length; i++) {
+            if (constArray[i].equals(constValue)) {
+                // decide on colors and put them in colors.xml
+                if (i <= 2) {
+                    // colorDrawable = new ColorDrawable(this.getColor(R.color.root));
+                    color = ContextCompat.getColor(this, R.color.root);
+                } else if (i <= 5) {
+                    // colorDrawable = new ColorDrawable(this.getColor(R.color.flower));
+                    color = ContextCompat.getColor(this, R.color.flower);
+                } else if (i <= 9) {
+                    // colorDrawable = new ColorDrawable(this.getColor(R.color.leaf));
+                    color = ContextCompat.getColor(this, R.color.leaf);
+                } else {
+                    // colorDrawable = new ColorDrawable(this.getColor(R.color.fruit));
+                    color = ContextCompat.getColor(this, R.color.fruit);
+                }
+                toolbar.setBackgroundColor(color);
+                break;
+            }
+        }
+    }
+
+    public void clickReturn(View view) {
+        finish();
     }
 }

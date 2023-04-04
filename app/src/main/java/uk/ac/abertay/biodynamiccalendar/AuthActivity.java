@@ -23,7 +23,6 @@ public class AuthActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient gsc;
-
     private static final int RC_SIGN_IN = 60;
 
     @Override
@@ -31,27 +30,25 @@ public class AuthActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
 
-        // hide action bar for the splash screen
+        /* // hide action bar
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
-        }
-
-        SignInButton signIn = findViewById(R.id.google_auth);
+        } */
 
         mAuth = FirebaseAuth.getInstance();
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().requestIdToken(getString(R.string.default_web_client_id)).build();
         gsc = GoogleSignIn.getClient(this, gso);
 
+        SignInButton signIn = findViewById(R.id.google_auth);
         signIn.setOnClickListener(view -> signIn());
     }
 
     @Override
      public void onStart() {
         super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
+        // check for and redirect signed in users.
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        // updateUI(currentUser);
         if (currentUser != null) {
             startActivity(new Intent(AuthActivity.this, SplashActivity.class));
         }
@@ -59,34 +56,40 @@ public class AuthActivity extends AppCompatActivity {
 
     private void signIn() {
         Intent signInIntent = gsc.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        startActivityForResult(signInIntent, RC_SIGN_IN); // deprecated method, however new approach breaks and complicates things
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        // returned result from launching the intent from GoogleSignInApi.getSignInIntent();
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
-                // Google Sign In was successful, authenticate with Firebase
+                // successful google sign in, authenticate with firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 Log.d("AUTH", "firebaseAuthWithGoogle:" + account.getId());
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
-                // Google Sign In failed, update UI appropriately
+                // failed sign in
                 Log.w("AUTH", "Google sign in failed", e);
+                // add stuff
             }
         }
     }
 
+    // firebase authentication
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential).addOnSuccessListener(this, authResult -> {
+                    // success
                     startActivity(new Intent(AuthActivity.this, SplashActivity.class));
                     finish();
                 }).addOnFailureListener(this, e ->
+                    // failure
                         Toast.makeText(AuthActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show());
     }
 }
+
+// edit messages
