@@ -52,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
         // need to check for permissions
         // need to get location
 
+        // app to be portrait only?
+
         mAuth = FirebaseAuth.getInstance();
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().requestIdToken(getString(R.string.default_web_client_id)).build();
         gsc = GoogleSignIn.getClient(this, gso);
@@ -175,8 +177,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void clickHome(View view) {
-        // recreate();
+    public void clickHelp(View view) {
+        startActivity(new Intent(MainActivity.this, AboutActivity.class));
     }
 
     public void clickSignout(View view) {

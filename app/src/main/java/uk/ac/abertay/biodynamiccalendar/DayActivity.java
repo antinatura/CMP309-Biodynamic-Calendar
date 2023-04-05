@@ -136,16 +136,12 @@ public class DayActivity extends AppCompatActivity {
             if (constArray[i].equals(constValue)) {
                 // decide on colors and put them in colors.xml
                 if (i <= 2) {
-                    // colorDrawable = new ColorDrawable(this.getColor(R.color.root));
                     color = ContextCompat.getColor(this, R.color.root);
                 } else if (i <= 5) {
-                    // colorDrawable = new ColorDrawable(this.getColor(R.color.flower));
                     color = ContextCompat.getColor(this, R.color.flower);
                 } else if (i <= 9) {
-                    // colorDrawable = new ColorDrawable(this.getColor(R.color.leaf));
                     color = ContextCompat.getColor(this, R.color.leaf);
                 } else {
-                    // colorDrawable = new ColorDrawable(this.getColor(R.color.fruit));
                     color = ContextCompat.getColor(this, R.color.fruit);
                 }
                 toolbar.setBackgroundColor(color);

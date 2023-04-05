@@ -4,7 +4,7 @@
         <bitmap
             android:gravity="top|left"
             android:tint="#895c00"
-            android:src="@drawable/root" />
+            android:src="@drawable/root2" />
     </item>
 </layer-list>
     

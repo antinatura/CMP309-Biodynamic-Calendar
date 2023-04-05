@@ -2,7 +2,24 @@
     <string name="app_name">Biodynamic Calendar</string>
     <string name="date">Date</string>
     <string name="api_response">Moon in:\u0020</string>
-    <string name="notes">Notes:</string>
-    <string name="note_btn">Add Note</string>
+    <string name="notes">Add note…</string>
+    <string name="note_btn">Save</string>
     <string name="sign_out">Sign Out</string>
+    <string name="about">
+        <![CDATA[
+        <p>A biodynamic calendar is a tool used by gardeners and farmers to plan and organize their activities according to the moon phase and its location in the sky.</p>
+        <p>Based on the principles of biodynamic agriculture, which emphasizes the importance of harmonizing with nature and the cosmos, the calendar provides guidance on when to plant, harvest, and carry out other tasks.</p>
+        <p>Each day in the calendar is associated with a particular aspect of plant growth, such as root development or fruiting and this information is used to determine the best times for various gardening activities. These days are determined based on the element of the zodiac sign whose constellation the moon is in.</p>
+
+        <p>Root days - </p>
+        <p>Flower days - </p>
+        <p>Leaf days - </p>
+        <p>Fruit days - </p>
+
+        <p>During full and new moons</p>
+
+        <p>Ance Strazdina, CMP309, 2023</p>
+        ]]>
+    </string>
+    <string name="help">About</string>
 </resources>

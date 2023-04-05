@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="12dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,7 +15,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/icon_arrow_back"/>
+            android:src="@drawable/icon_close"/>
 
         <TextView
             android:layout_width="0dp"
@@ -22,29 +23,6 @@
             android:layout_marginStart="16dp"
             android:layout_weight="1"
             android:padding="12dp" />
-    </LinearLayout>
-
-    <!-- buttons for later
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:minHeight="48dp"
-        android:onClick="clickHome"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/baseline_home_24" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_weight="1"
-            android:padding="12dp"
-            android:text="Home" />
     </LinearLayout>
 
     <LinearLayout
@@ -58,7 +36,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/baseline_help_24" />
+            android:src="@drawable/icon_help" />
 
         <TextView
             android:layout_width="0dp"
@@ -66,9 +44,10 @@
             android:layout_marginStart="16dp"
             android:layout_weight="1"
             android:padding="12dp"
-            android:text="Help" />
+            android:text="@string/help" />
     </LinearLayout>
 
+    <!-- buttons for later
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
