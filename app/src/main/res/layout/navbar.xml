@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="12dp">
 
@@ -10,6 +11,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
+        android:minHeight="48dp"
         android:onClick="closeMenu">
 
         <ImageView
@@ -25,9 +27,26 @@
             android:padding="12dp" />
     </LinearLayout>
 
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="16dp"
+        app:shapeAppearanceOverlay="@style/circleImageView"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/email"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textAlignment="center" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:gravity="center_vertical"
         android:minHeight="48dp"
         android:onClick="clickHelp"
@@ -91,17 +110,5 @@
             android:padding="12dp"
             android:text="@string/sign_out" />
     </LinearLayout>
-
-    <!--
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:minHeight="48dp"
-        android:onClick="clickSignout"
-        android:orientation="horizontal"
-        android:text="Sign Out"
-        app:drawableLeftCompat="@drawable/icon_signout" />
-    -->
 
 </LinearLayout>

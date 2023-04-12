@@ -20,6 +20,8 @@ public class SplashActivity extends AppCompatActivity {
             getSupportActionBar().hide();
         } */
 
+        // request perms (if needed) would be for location and message i guess
+
         Handler handler = new Handler();
         handler.postDelayed(() -> {
             startActivity(new Intent(SplashActivity.this, MainActivity.class));

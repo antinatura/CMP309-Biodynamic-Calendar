@@ -7,8 +7,7 @@
     <string name="sign_out">Sign Out</string>
     <string name="about">
         <![CDATA[
-        <p>A biodynamic calendar is a tool used by gardeners and farmers to plan and organize their activities according to the moon phase and its location in the sky.</p>
-        <p>Based on the principles of biodynamic agriculture, which emphasizes the importance of harmonizing with nature and the cosmos, the calendar provides guidance on when to plant, harvest, and carry out other tasks.</p>
+        <p>Based on the principles of biodynamic agriculture, which emphasizes the importance of harmonizing with nature and the cosmos, the biodynamic calendar is a tool used by gardeners and farmers to plan and organize activities according to the moon phase and its location in the sky. It provides guidance on when to plant, harvest, and carry out other tasks.</p>
         <p>Each day in the calendar is associated with a particular aspect of plant growth, such as root development or fruiting and this information is used to determine the best times for various gardening activities. These days are determined based on the element of the zodiac sign whose constellation the moon is in.</p>
 
         <p>Root days - </p>
@@ -16,7 +15,7 @@
         <p>Leaf days - </p>
         <p>Fruit days - </p>
 
-        <p>During full and new moons</p>
+        <p>During full and new moons. . .</p>
 
         <p>Ance Strazdina, CMP309, 2023</p>
         ]]>

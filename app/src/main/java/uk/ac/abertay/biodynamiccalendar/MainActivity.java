@@ -8,27 +8,39 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.applandeo.materialcalendarview.CalendarView;
 import com.applandeo.materialcalendarview.EventDay;
+import com.applandeo.materialcalendarview.listeners.OnCalendarPageChangeListener;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.net.URL;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -55,23 +67,27 @@ public class MainActivity extends AppCompatActivity {
         // app to be portrait only?
 
         mAuth = FirebaseAuth.getInstance();
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().requestIdToken(getString(R.string.default_web_client_id)).build();
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().requestIdToken(getString(R.string.default_web_client_id)).requestProfile().build();
         gsc = GoogleSignIn.getClient(this, gso);
+
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
 
         drawerLayout = findViewById(R.id.main_layout);
         CalendarView calendarView = findViewById(R.id.calendarView); // get calendar view object
 
+        ImageView icon = findViewById(R.id.icon);
+        TextView email = findViewById(R.id.email);
+
+        String imgUrl = String.valueOf(acct.getPhotoUrl());
+        imgUrl = imgUrl.replace("s96-c", "s192-c");
+        Picasso.get().load(imgUrl).into(icon);
+
+        String personEmail = acct.getEmail();
+        email.setText(personEmail);
+
         setLimits(calendarView); // set minimum and maximum date for calendarView
 
         Calendar currCal = Calendar.getInstance(); // get current date
-
-        /* // saving to shared preferences somehow
-        List<EventDay> events;
-        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("EVENTS_PREFS", Context.MODE_PRIVATE);
-        String serializedObject = sharedPreferences.getString("parsed_data", null);
-        Gson gson = new Gson();
-        Type type = new TypeToken<ArrayList<EventDay>>(){}.getType();
-        events = gson.fromJson(serializedObject, type); */
 
         List<EventDay> events = Collections.synchronizedList(new ArrayList<>());
 
@@ -86,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         // add if in shared resources
 
         calendarView.setEvents(events); // run in bg somehow?
-        calendarView.invalidate(); // call this on month change?
+        drawerLayout.invalidate(); // call this on month change?
         // Log.d("Main Activity", "Drew stuff.");
 
         // when a specific day is tapped, open a page for it
@@ -112,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void parseMonth(Calendar currCal, List<EventDay> events) {
         String[] dates = formatDate(currCal);
-        // List<EventDay> events = Collections.synchronizedList(new ArrayList<>());
         YearMonth yearMonthObject = YearMonth.of(Integer.parseInt(dates[0]), Integer.parseInt(dates[1]));
 
         // will be pulled from db
@@ -130,10 +145,6 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-
-        // CalendarView calendarView = findViewById(R.id.calendarView);
-        // calendarView.setEvents(events);
-        // Log.d("Main Activity", "Drew stuff.");
     }
 
    // find a way to pass day type as intent
@@ -214,7 +225,23 @@ class Request implements Runnable {
     @Override
     public void run() {
         // Log.d("Request", "Thread started - " + i);
-        try{
+
+        String date = i + dates[1] + dates[0];
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference moonPhase = db.document("/moonPhases/fullNewMoons");
+
+        moonPhase.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    if(document.getString(date) == null){
+                        makeReq();
+                    }
+                }
+            }
+        });
+
+        /* try{
             // Make an API request with volley
             StringRequest stringRequest = new StringRequest(url, response -> {
                 try {
@@ -239,11 +266,41 @@ class Request implements Runnable {
 
         } catch (Exception e) {
             e.printStackTrace();
+        } */
+    }
+
+    private void makeReq () {
+        try{
+            // Make an API request with volley
+            StringRequest stringRequest = new StringRequest(url, response -> {
+                try {
+                    JSONObject responseObject = new JSONObject(response);
+                    JSONArray responseArray = responseObject.getJSONArray("data");
+
+                    JSONObject moonArray = responseArray.getJSONObject(1);
+                    String constValue = moonArray.getString("constellation");
+
+                    labelDay(constValue);
+
+                }  catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }, error -> {
+                // add error stuff
+            });
+
+            // Add the request to the RequestQueue
+            RequestQueue requestQueue = Volley.newRequestQueue(context);
+            requestQueue.add(stringRequest);
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     // labels days based on their type
-    private void labelDay(int i, String[] dates, String constValue, List<EventDay> events){
+    // add each day in shared prefs? then pass ass intents to day activity
+    private void labelDay(String constValue){
         // array needs improvements
         String[] constArray = {"Capricornus","Taurus", "Virgo", "Gemini", "Libra", "Aquarius", "Pisces", "Scorpius", "Cancer", "Ophiuchus", "Aries", "Sagittarius", "Leo"};
 
