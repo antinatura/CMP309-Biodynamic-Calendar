@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/toolbar"
+    android:id="@+id/appbar_sub"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/purple_500"
+    android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:orientation="horizontal">
+    android:background="@color/purple_500">
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:minWidth="48dp"
         android:minHeight="48dp"
+        android:onClick="clickReturn"
+        android:src="@drawable/icon_home"
         android:paddingStart="6dp"
         android:paddingEnd="6dp"
-        android:onClick="openMenu"
-        android:src="@drawable/icon_menu" />
+        />
 
     <TextView
         android:layout_width="0dp"
@@ -27,6 +28,4 @@
         android:textColor="@color/white"
         android:textSize="20sp"
         android:textStyle="bold" />
-    <!-- add margins + font is ugly, make it nice -->
-
 </LinearLayout>

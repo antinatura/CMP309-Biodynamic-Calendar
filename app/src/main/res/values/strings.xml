@@ -1,24 +1,25 @@
 <resources>
     <string name="app_name">Biodynamic Calendar</string>
     <string name="date">Date</string>
-    <string name="api_response">Moon in:\u0020</string>
+    <string name="dayType">Day type</string>
     <string name="notes">Add note…</string>
     <string name="note_btn">Save</string>
     <string name="sign_out">Sign Out</string>
     <string name="about">
         <![CDATA[
         <p>Based on the principles of biodynamic agriculture, which emphasizes the importance of harmonizing with nature and the cosmos, the biodynamic calendar is a tool used by gardeners and farmers to plan and organize activities according to the moon phase and its location in the sky. It provides guidance on when to plant, harvest, and carry out other tasks.</p>
-        <p>Each day in the calendar is associated with a particular aspect of plant growth, such as root development or fruiting and this information is used to determine the best times for various gardening activities. These days are determined based on the element of the zodiac sign whose constellation the moon is in.</p>
+        <p>Each day in the calendar is associated with a particular aspect of plant growth, such as root development or fruiting and this information is used to determine the best times for various gardening activities. These days are determined based on the moon phase and the element of the zodiac sign whose constellation it is in.</p>
 
-        <p>Root days - </p>
-        <p>Flower days - </p>
-        <p>Leaf days - </p>
-        <p>Fruit days - </p>
+        <p><b>Root days</b> - focuses on root crops like potatoes and carrots.</p>
+        <p><b>Flower days</b> - focuses on cultivating flowers, flowering herbs, hedges, and trees.</p>
+        <p><b>Leaf days</b> - focuses on leafy plans such as salads, spinach, and cabbages as well as grass or non flowering hedges.</p>
+        <p><b>Fruit days</b> - focuses on all fruits as well as all non-root vegetables.</p>
 
-        <p>During full and new moons. . .</p>
+        <p>During full and new moons any gardening activities should be paused, therefore these days are not labelled.</p>
 
-        <p>Ance Strazdina, CMP309, 2023</p>
+        <p><u>Ance Strazdina, CMP309, 2023</u></p>
         ]]>
     </string>
     <string name="help">About</string>
+    <string name="user">User</string>
 </resources>

@@ -3,6 +3,8 @@ package uk.ac.abertay.biodynamiccalendar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -13,17 +15,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,23 +27,27 @@ import java.util.Objects;
 public class DayActivity extends AppCompatActivity {
 
     FirebaseAuth mAuth;
+    public FirebaseFirestore db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_day);
 
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         // get variables from extras
         String[] extras = this.getIntent().getStringArrayExtra("extras");
-        String date = extras[2] + extras[1] + extras[0]; //
+        String date = extras[2] + extras[1] + extras[0]; // day id
 
+        // get layout elements
         EditText input = findViewById(R.id.notesInputEdit);
         Button submit = findViewById(R.id.submit);
 
-        formatDay(extras);
-        getNote(date);
+        formatDay(extras); // format date TextView and toolbar color
+        getNote(date); // get note from database if there is one
 
+        // add note on button click
         submit.setOnClickListener(view -> {
            String note = input.getText().toString();
             if (TextUtils.isEmpty(note)) {
@@ -59,8 +58,9 @@ public class DayActivity extends AppCompatActivity {
         });
     }
 
+    // retrieve note
     private void getNote(String dateDoc){
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        // FirebaseFirestore db = FirebaseFirestore.getInstance();
         String uid = Objects.requireNonNull(mAuth.getCurrentUser()).getUid(); // ?
         DocumentReference dbNotes = db.document("/users/" + uid + "/notes/" + dateDoc);
 
@@ -75,9 +75,10 @@ public class DayActivity extends AppCompatActivity {
         });
     }
 
+    // add note
     private void addNote(String dateDoc, String note) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String uid = Objects.requireNonNull(mAuth.getCurrentUser()).getUid(); // ?
+        // FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String uid = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
         DocumentReference dbNotes = db.document("/users/" + uid + "/notes/" + dateDoc);
         Map<String, Object> docData = new HashMap<>();
         docData.put("note", note);
@@ -88,22 +89,50 @@ public class DayActivity extends AppCompatActivity {
     }
 
     private void formatDay(String[] extras) {
-        // will be passing all the day type stuff as with intents after as the main activity handles API now
-        String iso8601 = extras[0] + extras[1] + extras[2] + "T100000"; // iso8601 timestamp for the API call
-        // locations will be used from db
-        String latitude = "56.462002";
-        String longitude = "-2.970700";
+        // will be passing all the day type stuff with intents
+        // String iso8601 = extras[0] + extras[1] + extras[2] + "T100000";
 
         TextView dateView = findViewById(R.id.date);
         String date = extras[2] + "/" + extras[1] + "/" + extras[0];
         dateView.setText(date);
 
-        final TextView constellation = findViewById(R.id.response);
+        final TextView constellation = findViewById(R.id.dayType);
 
-        // API query
+        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("biodynamiccalendar_DAYTYPES", Context.MODE_PRIVATE);
+        int dayType = sharedPref.getInt(extras[2] + extras[1] + extras[0], -1);
+        switch (dayType) {
+            case 1:
+                constellation.setText("Root day");
+                colorAppbar(dayType);
+                break;
+            case 2:
+                constellation.setText("Flower day");
+                colorAppbar(dayType);
+                break;
+            case 3:
+                constellation.setText("Leaf day");
+                colorAppbar(dayType);
+                break;
+            case 4:
+                constellation.setText("Fruit day");
+                colorAppbar(dayType);
+                break;
+            default:
+                DocumentReference moonPhase = db.document("/moonPhases/fullNewMoons");
+                moonPhase.get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            constellation.setText(document.getString(extras[2] + extras[1] + extras[0]));
+                        }
+                    }
+                });
+        }
+
+        // will be removed
+        /* String latitude = "56.462002";
+        String longitude = "-2.970700";
         String url = "https://api.visibleplanets.dev/v3?latitude=" + latitude + "&longitude=" + longitude + "&aboveHorizon=false&time=" + iso8601;
-
-        // Make an API request with volley
         StringRequest stringRequest = new StringRequest(url, response -> {
             try {
                 JSONObject responseObject = new JSONObject(response);
@@ -113,28 +142,25 @@ public class DayActivity extends AppCompatActivity {
                 String constValue = moonArray.getString("constellation");
                 constellation.append(constValue);
 
-                colorToolbar(constValue);
+                colorAppbar(constValue);
 
             }  catch (JSONException e) {
                 e.printStackTrace();
             }
         }, error -> {
-            // add error stuff
         });
-
-        // Add the request to the RequestQueue
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-        requestQueue.add(stringRequest);
+        requestQueue.add(stringRequest); */
     }
 
-    private void colorToolbar(String constValue) {
-        String[] constArray = {"Capricornus","Taurus", "Virgo", "Gemini", "Libra", "Aquarius", "Pisces", "Scorpius", "Cancer", "Ophiuchus", "Aries", "Sagittarius", "Leo"};
-        LinearLayout toolbar = findViewById(R.id.toolbar2);
+    // toolbar color based on day type
+    private void colorAppbar(int dayType) {
+        // String[] constArray = {"Capricornus","Taurus", "Virgo", "Gemini", "Libra", "Aquarius", "Pisces", "Scorpius", "Cancer", "Ophiuchus", "Aries", "Sagittarius", "Leo"};
+        LinearLayout toolbar = findViewById(R.id.appbar_sub);
         int color;
 
-        for (int i = 0; i < constArray.length; i++) {
+        /* for (int i = 0; i < constArray.length; i++) {
             if (constArray[i].equals(constValue)) {
-                // decide on colors and put them in colors.xml
                 if (i <= 2) {
                     color = ContextCompat.getColor(this, R.color.root);
                 } else if (i <= 5) {
@@ -147,9 +173,21 @@ public class DayActivity extends AppCompatActivity {
                 toolbar.setBackgroundColor(color);
                 break;
             }
+        } */
+        // cases?
+        if (dayType == 1) {
+            color = ContextCompat.getColor(this, R.color.root);
+        } else if (dayType == 2) {
+            color = ContextCompat.getColor(this, R.color.flower);
+        } else if (dayType == 3) {
+            color = ContextCompat.getColor(this, R.color.leaf);
+        } else {
+            color = ContextCompat.getColor(this, R.color.fruit);
         }
+        toolbar.setBackgroundColor(color);
     }
 
+    // click on the home icon
     public void clickReturn(View view) {
         finish();
     }

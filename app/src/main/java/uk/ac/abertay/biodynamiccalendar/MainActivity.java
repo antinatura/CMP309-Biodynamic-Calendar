@@ -8,13 +8,9 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,7 +19,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.applandeo.materialcalendarview.CalendarView;
 import com.applandeo.materialcalendarview.EventDay;
-import com.applandeo.materialcalendarview.listeners.OnCalendarPageChangeListener;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -38,9 +33,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.InputStream;
-import java.lang.reflect.Type;
-import java.net.URL;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -49,105 +41,116 @@ import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
     static DrawerLayout drawerLayout;
-
     private FirebaseAuth mAuth;
-
     private GoogleSignInClient gsc;
+    // RxDataStore<Preferences> dataStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // need to check for permissions
-        // need to get location
-
-        // app to be portrait only?
-
+        // same as auth activity
         mAuth = FirebaseAuth.getInstance();
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().requestIdToken(getString(R.string.default_web_client_id)).requestProfile().build();
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .build();
         gsc = GoogleSignIn.getClient(this, gso);
-
+        // get google profile information
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
 
+        // RxDataStore<Preferences> dataStore = new RxPreferenceDataStoreBuilder(this, /*name=*/ "biodynamiccalendar_DAYTYPES").build();
+
+        // get layout elements
         drawerLayout = findViewById(R.id.main_layout);
-        CalendarView calendarView = findViewById(R.id.calendarView); // get calendar view object
+        CalendarView calendarView = findViewById(R.id.calendarView);
+        ImageView icon = findViewById(R.id.userIcon);
+        TextView email = findViewById(R.id.userEmail);
 
-        ImageView icon = findViewById(R.id.icon);
-        TextView email = findViewById(R.id.email);
-
-        String imgUrl = String.valueOf(acct.getPhotoUrl());
-        imgUrl = imgUrl.replace("s96-c", "s192-c");
-        Picasso.get().load(imgUrl).into(icon);
-
-        String personEmail = acct.getEmail();
-        email.setText(personEmail);
+        // populate profile picture and email with current user information
+        if (acct != null) {
+            String imgUrl = String.valueOf(acct.getPhotoUrl());
+            imgUrl = imgUrl.replace("s96-c", "s192-c");
+            Picasso.get().load(imgUrl).into(icon);
+            String personEmail = acct.getEmail();
+            email.setText(personEmail);
+        }
 
         setLimits(calendarView); // set minimum and maximum date for calendarView
 
         Calendar currCal = Calendar.getInstance(); // get current date
-
-        List<EventDay> events = Collections.synchronizedList(new ArrayList<>());
-
-        // if not in shared resources?
+        List<EventDay> events = Collections.synchronizedList(new ArrayList<>()); // initialise array list to store cell labels
         parseMonth(currCal, events); // parse the current month
-        // add if in shared resources
-
-        // if not in shared resources?
-        // parse the next month (only the nearest months are needed for the app to serve its purpose)
+        // parse the next month (only the current and next month are needed for the app)
         currCal.add(Calendar.MONTH, 1);
         parseMonth(currCal, events);
-        // add if in shared resources
 
-        calendarView.setEvents(events); // run in bg somehow?
-        drawerLayout.invalidate(); // call this on month change?
-        // Log.d("Main Activity", "Drew stuff.");
+        // events wont log for some reason
+        calendarView.setEvents(events); // add cell labels to CalendarView
+        drawerLayout.invalidate();
 
         // when a specific day is tapped, open a page for it
         calendarView.setOnDayClickListener(this::launchDay);
 
+        // message of the day
+        // find a way to pass day type as intent
+        // make app portrait only
         // gotta also do something about the lifecycle
-        // add menu with app info, user info + maybe language and theme change buttons
-        // moon phase api bc full and new moon should be gray and not any of the day types
-
-        // any way to save the view and not have it pull stuff from db (if its there) every time?
+        // add language and theme change buttons to navigation drawer
+        // any way to save the view?
     }
 
-    // set minimum and maximum date for calendarView
+    // set minimum and maximum date for CalendarView
     private void setLimits(CalendarView calendarView) {
         Calendar min = Calendar.getInstance();
         Calendar max = Calendar.getInstance();
-        // limits are a year before and after the current date
-        min.add(Calendar.YEAR, - 1);
-        max.add(Calendar.YEAR, 1);
+        // limits are a year before and after the current date ???
+        min.add(Calendar.MONTH, - 3);
+        max.add(Calendar.MONTH, 6);
         calendarView.setMinimumDate(min);
         calendarView.setMaximumDate(max);
     }
 
+    // starts runnables that will format days for all days of the month
     private void parseMonth(Calendar currCal, List<EventDay> events) {
         String[] dates = formatDate(currCal);
-        YearMonth yearMonthObject = YearMonth.of(Integer.parseInt(dates[0]), Integer.parseInt(dates[1]));
+        YearMonth yearMonthObject = YearMonth.of(Integer.parseInt(dates[0]), Integer.parseInt(dates[1])); // gets days of month
 
         // will be pulled from db
         String latitude = "56.462002";
         String longitude = "-2.970700";
 
         for (int i = 1; i <= yearMonthObject.lengthOfMonth(); i++) {
-            String iso8601 = dates[0] + dates[1] + i + "T100000"; // maybe also change time stuff. currently 10am
+            int finalI = i;
+            String iso8601 = dates[0] + dates[1] + i + "T100000"; // iso8601 timestamp for API request. set to 10am
             String url = "https://api.visibleplanets.dev/v3?latitude=" + latitude + "&longitude=" + longitude + "&aboveHorizon=false&time=" + iso8601;
 
-            try {
-                Request request = new Request(i, url, dates, events, this.getApplicationContext());
-                new Thread(request).start();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            // get firestore instances
+            FirebaseFirestore db = FirebaseFirestore.getInstance(); // move this?
+            DocumentReference moonPhase = db.document("/moonPhases/fullNewMoons");
+
+            // check if day id exists in full/new moon document. if not, make an API request
+            moonPhase.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        if(document.getString(finalI + dates[1] + dates[0]) == null){
+                            try {
+                                Request request = new Request(finalI, url, dates, events, this.getApplicationContext());
+                                new Thread(request).start();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            });
         }
     }
 
-   // find a way to pass day type as intent
+   // launch clicked day
     private void launchDay(EventDay eventDay) {
         // get clicked day's calendar values
         Date clickedDay = eventDay.getCalendar().getTime();
@@ -160,15 +163,14 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    // date format function, this will get some tweaks bc its interfering with some stuff with how im formatting it.
-    // maybe make it return int[] and only do stringvalueof() where needed.
-    // the + 1 also interferes with some stuff where months are counted from 0.
+    // date format function
+    // go over later
     private String[] formatDate(Calendar calendar) {
         // get values and format to strings (for displaying easier and API query formatting)
         String year = String.valueOf(calendar.get(Calendar.YEAR));
         String month;
         if (calendar.get(Calendar.MONTH) < 9) {
-            //  prefix with 0 if month is a single digit (for API query formatting)
+            //  prefix with 0 if month is a single digit (also for API query formatting)
             month = "0" + (calendar.get(Calendar.MONTH) + 1);
         } else {
             month = String.valueOf(calendar.get(Calendar.MONTH) + 1);
@@ -178,20 +180,30 @@ public class MainActivity extends AppCompatActivity {
         return new String[] {year, month, day};
     }
 
+    /* public void writeDayToSharedPrefs (String dayId, int dayTypeId) {
+        SharedPreferences dayTypePrefs = getSharedPreferences("uk.ac.abertay.biodynamiccalendar.DAY_TYPE_PREFS", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = dayTypePrefs.edit();
+        editor.putInt(dayId, dayTypeId);
+        editor.apply();
+    } */
+
+    // open navigation drawer
     public void openMenu(View view) {
         drawerLayout.openDrawer(GravityCompat.START);
     }
-
+    // close navigation drawer
     public void closeMenu(View view) {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         }
     }
 
+    // launch about activity
     public void clickHelp(View view) {
         startActivity(new Intent(MainActivity.this, AboutActivity.class));
     }
 
+    // sign out current user
     public void clickSignout(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Sign Out");
@@ -208,67 +220,29 @@ public class MainActivity extends AppCompatActivity {
 }
 
 // makes parallel API requests
-// go over later and check for any improvements
 class Request implements Runnable {
     int i;
     String url;
     String[] dates;
     List<EventDay> events;
     Context context;
+    // RxDataStore<Preferences> dataStore;
     Request (int i, String url, String[] dates, List<EventDay> events, Context context) {
         this.i = i;
         this.url = url;
         this.dates = dates;
         this.events = events;
         this.context = context;
+        // this.dataStore = new RxPreferenceDataStoreBuilder(context, /*name=*/ "biodynamiccalendar_DAYTYPES").build();
     }
     @Override
     public void run() {
-        // Log.d("Request", "Thread started - " + i);
-
-        String date = i + dates[1] + dates[0];
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentReference moonPhase = db.document("/moonPhases/fullNewMoons");
-
-        moonPhase.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
-                    if(document.getString(date) == null){
-                        makeReq();
-                    }
-                }
-            }
-        });
-
-        /* try{
-            // Make an API request with volley
-            StringRequest stringRequest = new StringRequest(url, response -> {
-                try {
-                    JSONObject responseObject = new JSONObject(response);
-                    JSONArray responseArray = responseObject.getJSONArray("data");
-
-                    JSONObject moonArray = responseArray.getJSONObject(1);
-                    String constValue = moonArray.getString("constellation");
-
-                    labelDay(i, dates, constValue, events);
-
-                }  catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }, error -> {
-                // add error stuff
-            });
-
-            // Add the request to the RequestQueue
-            RequestQueue requestQueue = Volley.newRequestQueue(context);
-            requestQueue.add(stringRequest);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } */
+        makeReq();
+        // request code used to be here
     }
 
+    // make a request to visibleplanets API
+    // add params and move to oncreate as public? so can be called from day activity if needed
     private void makeReq () {
         try{
             // Make an API request with volley
@@ -280,7 +254,7 @@ class Request implements Runnable {
                     JSONObject moonArray = responseArray.getJSONObject(1);
                     String constValue = moonArray.getString("constellation");
 
-                    labelDay(constValue);
+                    labelDay(constValue); // add the function call in run()
 
                 }  catch (JSONException e) {
                     e.printStackTrace();
@@ -289,17 +263,18 @@ class Request implements Runnable {
                 // add error stuff
             });
 
-            // Add the request to the RequestQueue
+            // add the request to the RequestQueue
             RequestQueue requestQueue = Volley.newRequestQueue(context);
             requestQueue.add(stringRequest);
 
         } catch (Exception e) {
             e.printStackTrace();
+            // add error stuff
         }
     }
 
     // labels days based on their type
-    // add each day in shared prefs? then pass ass intents to day activity
+    // add each day in shared prefs from here?
     private void labelDay(String constValue){
         // array needs improvements
         String[] constArray = {"Capricornus","Taurus", "Virgo", "Gemini", "Libra", "Aquarius", "Pisces", "Scorpius", "Cancer", "Ophiuchus", "Aries", "Sagittarius", "Leo"};
@@ -310,16 +285,31 @@ class Request implements Runnable {
 
             if (constArray[a].equals(constValue)) {
                 if (a <= 2) {
-                    events.add(new EventDay(calendar, R.drawable.event_root)); // this icon will get changed
+                    events.add(new EventDay(calendar, R.drawable.event_root));
+                    writeToPrefs(1);
                 } else if (a <= 5) {
                     events.add(new EventDay(calendar, R.drawable.event_flower));
+                    writeToPrefs(2);
                 } else if (a <= 9) {
                     events.add(new EventDay(calendar, R.drawable.event_leaf));
+                    writeToPrefs(3);
                 } else {
+                    writeToPrefs(4);
                     events.add(new EventDay(calendar, R.drawable.event_fruit));
                 }
                 return;
             }
+        }
+    }
+
+    private void writeToPrefs(int type) {
+        // update check here as well?
+        SharedPreferences sharedPref = context.getSharedPreferences("biodynamiccalendar_DAYTYPES", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        // Int field =  sharedPref.getInt(i + dates[1] + dates[0], -1);
+        if (!sharedPref.contains(i + dates[1] + dates[0])) {
+            editor.putInt(i + dates[1] + dates[0], type);
+            editor.commit();
         }
     }
 }

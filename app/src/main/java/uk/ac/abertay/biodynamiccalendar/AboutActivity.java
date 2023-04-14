@@ -14,11 +14,12 @@ public class AboutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
 
-        TextView aboutTextView = findViewById(R.id.about_text);
-
+        // get TextView and set formatted html contents
+        TextView aboutTextView = findViewById(R.id.about);
         aboutTextView.setText(Html.fromHtml(getString(R.string.about)));
     }
 
+    // return home if home button is clicked
     public void clickReturn(View view) {
         finish();
     }

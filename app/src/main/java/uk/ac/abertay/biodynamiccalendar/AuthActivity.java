@@ -23,58 +23,58 @@ public class AuthActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient gsc;
-    private static final int RC_SIGN_IN = 60;
+    private static final int RC_SIGN_IN = 60; //
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
 
-        /* // hide action bar
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        } */
-
+        // initialise firebase instance
         mAuth = FirebaseAuth.getInstance();
-
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().requestIdToken(getString(R.string.default_web_client_id)).build();
+        // configure google sign in options
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .build();
+        // build a sign in client with previously configured options
         gsc = GoogleSignIn.getClient(this, gso);
 
-        SignInButton signIn = findViewById(R.id.google_auth);
-        signIn.setOnClickListener(view -> signIn());
+        SignInButton signIn = findViewById(R.id.googleAuth);
+        signIn.setOnClickListener(view -> signIn()); // on sign in button click, start google sign in
     }
 
     @Override
      public void onStart() {
         super.onStart();
-        // check for and redirect signed in users.
+        // check for and redirect signed in users
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             startActivity(new Intent(AuthActivity.this, SplashActivity.class));
         }
     }
 
+    // google sign in
     private void signIn() {
         Intent signInIntent = gsc.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN); // deprecated method, however new approach breaks and complicates things
+        startActivityForResult(signInIntent, RC_SIGN_IN); // deprecated method, however new approach seems to break and complicate things
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // returned result from launching the intent from GoogleSignInApi.getSignInIntent();
+        // returned result from launching GoogleSignInApi.getSignInIntent();
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
-                // successful google sign in, authenticate with firebase
+                // success, authenticate with firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 Log.d("AUTH", "firebaseAuthWithGoogle:" + account.getId());
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
-                // failed sign in
-                Log.w("AUTH", "Google sign in failed", e);
-                // add stuff
+                // failure
+                Toast.makeText(AuthActivity.this, "Google sign in failed.", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -83,13 +83,11 @@ public class AuthActivity extends AppCompatActivity {
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential).addOnSuccessListener(this, authResult -> {
-                    // success
+                    // success, launch the splash screen
                     startActivity(new Intent(AuthActivity.this, SplashActivity.class));
                     finish();
                 }).addOnFailureListener(this, e ->
                     // failure
-                        Toast.makeText(AuthActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show());
+                    Toast.makeText(AuthActivity.this, "Firebase authentication failed.", Toast.LENGTH_LONG).show());
     }
 }
-
-// edit messages
