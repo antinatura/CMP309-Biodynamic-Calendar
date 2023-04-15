@@ -14,7 +14,7 @@ public class AboutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
 
-        // get TextView and set formatted html contents
+        // get TextView and set text to HTML formatted about string
         TextView aboutTextView = findViewById(R.id.about);
         aboutTextView.setText(Html.fromHtml(getString(R.string.about)));
     }

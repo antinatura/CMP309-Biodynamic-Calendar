@@ -27,25 +27,25 @@ import java.util.Objects;
 public class DayActivity extends AppCompatActivity {
 
     FirebaseAuth mAuth;
-    public FirebaseFirestore db;
+    FirebaseFirestore db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_day);
 
+        // get firebase auth and storage instances
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
         // get variables from extras
-        String[] extras = this.getIntent().getStringArrayExtra("extras");
-        String date = extras[2] + extras[1] + extras[0]; // day id
+        String[] dateVals = this.getIntent().getStringArrayExtra("extras");
 
         // get layout elements
         EditText input = findViewById(R.id.notesInputEdit);
         Button submit = findViewById(R.id.submit);
 
-        formatDay(extras); // format date TextView and toolbar color
-        getNote(date); // get note from database if there is one
+        formatDay(dateVals); // format date TextView and toolbar color
+        getNote(dateVals[0] + "-" + dateVals[1] + "-" + dateVals[2]); // get note from database if there is one
 
         // add note on button click
         submit.setOnClickListener(view -> {
@@ -53,16 +53,15 @@ public class DayActivity extends AppCompatActivity {
             if (TextUtils.isEmpty(note)) {
                 input.setError("Field is empty!");
             } else {
-                addNote(date, note);
+                addNote(dateVals[0] + "-" + dateVals[1] + "-" + dateVals[2], note);
             }
         });
     }
 
     // retrieve note
-    private void getNote(String dateDoc){
-        // FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String uid = Objects.requireNonNull(mAuth.getCurrentUser()).getUid(); // ?
-        DocumentReference dbNotes = db.document("/users/" + uid + "/notes/" + dateDoc);
+    private void getNote(String date){
+        String uid = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
+        DocumentReference dbNotes = db.document("/users/" + uid + "/notes/" + date);
 
         dbNotes.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -76,10 +75,9 @@ public class DayActivity extends AppCompatActivity {
     }
 
     // add note
-    private void addNote(String dateDoc, String note) {
-        // FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private void addNote(String date, String note) {
         String uid = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
-        DocumentReference dbNotes = db.document("/users/" + uid + "/notes/" + dateDoc);
+        DocumentReference dbNotes = db.document("/users/" + uid + "/notes/" + date);
         Map<String, Object> docData = new HashMap<>();
         docData.put("note", note);
 
@@ -88,93 +86,57 @@ public class DayActivity extends AppCompatActivity {
                     Toast.makeText(DayActivity.this, "Something went wrong, please try again: \n" + e, Toast.LENGTH_SHORT).show());
     }
 
-    private void formatDay(String[] extras) {
-        // will be passing all the day type stuff with intents
-        // String iso8601 = extras[0] + extras[1] + extras[2] + "T100000";
-
+    // displays date and day type, changed appbar color
+    private void formatDay(String[] dateVals) {
         TextView dateView = findViewById(R.id.date);
-        String date = extras[2] + "/" + extras[1] + "/" + extras[0];
+        String date = dateVals[2] + "/" + dateVals[1] + "/" + dateVals[0];
         dateView.setText(date);
 
-        final TextView constellation = findViewById(R.id.dayType);
+        final TextView dayDesc = findViewById(R.id.dayDesc);
 
         SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("biodynamiccalendar_DAYTYPES", Context.MODE_PRIVATE);
-        int dayType = sharedPref.getInt(extras[2] + extras[1] + extras[0], -1);
+        int dayType = sharedPref.getInt(dateVals[0] + "-" + dateVals[1] + "-" + dateVals[2], -1);
         switch (dayType) {
             case 1:
-                constellation.setText("Root day");
+                dayDesc.setText(R.string.root);
                 colorAppbar(dayType);
                 break;
             case 2:
-                constellation.setText("Flower day");
+                dayDesc.setText(R.string.flower);
                 colorAppbar(dayType);
                 break;
             case 3:
-                constellation.setText("Leaf day");
+                dayDesc.setText(R.string.leaf);
                 colorAppbar(dayType);
                 break;
             case 4:
-                constellation.setText("Fruit day");
+                dayDesc.setText(R.string.fruit);
                 colorAppbar(dayType);
                 break;
             default:
-                DocumentReference moonPhase = db.document("/moonPhases/fullNewMoons");
-                moonPhase.get().addOnCompleteListener(task -> {
+                DocumentReference fullNewMoons = db.document("/moonPhases/fullNewMoons");
+                fullNewMoons.get().addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
-                            constellation.setText(document.getString(extras[2] + extras[1] + extras[0]));
+                            String moonPhase = document.getString(dateVals[0] + "-" + dateVals[1] + "-" + dateVals[2]);
+                            if (moonPhase != null && moonPhase.equals("Full Moon")){
+                                dayDesc.setText(R.string.full_moon);
+                            } else if (moonPhase != null && moonPhase.equals("New Moon")) {
+                                dayDesc.setText(R.string.new_moon);
+                            }
                         }
                     }
                 });
         }
-
-        // will be removed
-        /* String latitude = "56.462002";
-        String longitude = "-2.970700";
-        String url = "https://api.visibleplanets.dev/v3?latitude=" + latitude + "&longitude=" + longitude + "&aboveHorizon=false&time=" + iso8601;
-        StringRequest stringRequest = new StringRequest(url, response -> {
-            try {
-                JSONObject responseObject = new JSONObject(response);
-                JSONArray responseArray = responseObject.getJSONArray("data");
-
-                JSONObject moonArray = responseArray.getJSONObject(1);
-                String constValue = moonArray.getString("constellation");
-                constellation.append(constValue);
-
-                colorAppbar(constValue);
-
-            }  catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }, error -> {
-        });
-        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-        requestQueue.add(stringRequest); */
     }
 
-    // toolbar color based on day type
+    // appbar color based on day type
     private void colorAppbar(int dayType) {
-        // String[] constArray = {"Capricornus","Taurus", "Virgo", "Gemini", "Libra", "Aquarius", "Pisces", "Scorpius", "Cancer", "Ophiuchus", "Aries", "Sagittarius", "Leo"};
         LinearLayout toolbar = findViewById(R.id.appbar_sub);
         int color;
 
-        /* for (int i = 0; i < constArray.length; i++) {
-            if (constArray[i].equals(constValue)) {
-                if (i <= 2) {
-                    color = ContextCompat.getColor(this, R.color.root);
-                } else if (i <= 5) {
-                    color = ContextCompat.getColor(this, R.color.flower);
-                } else if (i <= 9) {
-                    color = ContextCompat.getColor(this, R.color.leaf);
-                } else {
-                    color = ContextCompat.getColor(this, R.color.fruit);
-                }
-                toolbar.setBackgroundColor(color);
-                break;
-            }
-        } */
-        // cases?
+        // use cases?
         if (dayType == 1) {
             color = ContextCompat.getColor(this, R.color.root);
         } else if (dayType == 2) {
