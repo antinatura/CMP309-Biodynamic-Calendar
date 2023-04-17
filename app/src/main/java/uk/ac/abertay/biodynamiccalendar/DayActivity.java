@@ -134,17 +134,21 @@ public class DayActivity extends AppCompatActivity {
     // appbar color based on day type
     private void colorAppbar(int dayType) {
         LinearLayout toolbar = findViewById(R.id.appbar_sub);
-        int color;
+        int color = ContextCompat.getColor(this, R.color.purple_500);
 
-        // use cases?
-        if (dayType == 1) {
-            color = ContextCompat.getColor(this, R.color.root);
-        } else if (dayType == 2) {
-            color = ContextCompat.getColor(this, R.color.flower);
-        } else if (dayType == 3) {
-            color = ContextCompat.getColor(this, R.color.leaf);
-        } else {
-            color = ContextCompat.getColor(this, R.color.fruit);
+        switch (dayType) {
+            case 1:
+                color = ContextCompat.getColor(this, R.color.root);
+                break;
+            case 2:
+                color = ContextCompat.getColor(this, R.color.flower);
+                break;
+            case 3:
+                color = ContextCompat.getColor(this, R.color.leaf);
+                break;
+            case 4:
+                color = ContextCompat.getColor(this, R.color.fruit);
+                break;
         }
         toolbar.setBackgroundColor(color);
     }

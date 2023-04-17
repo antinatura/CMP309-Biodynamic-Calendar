@@ -2,15 +2,21 @@ package uk.ac.abertay.biodynamiccalendar;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -39,6 +45,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     static DrawerLayout drawerLayout;
@@ -71,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         CalendarView calendarView = findViewById(R.id.calendarView);
         ImageView icon = findViewById(R.id.userIcon);
         TextView email = findViewById(R.id.userEmail);
+        SwitchCompat notifSwitch = findViewById(R.id.notifSwitch);
 
         // populate profile picture and email with current user information
         if (acct != null) {
@@ -83,21 +91,31 @@ public class MainActivity extends AppCompatActivity {
 
         setLimits(calendarView); // set minimum and maximum date for calendarView
 
-        Calendar currCal = Calendar.getInstance(); // get current date
+        boolean rewrite = this.getIntent().getBooleanExtra("rewrite", false);
         List<EventDay> events = Collections.synchronizedList(new ArrayList<>()); // initialise array list to store cell labels
+        if (rewrite) {
+            Calendar currCal = Calendar.getInstance(); // get current date
 
-        parseMonth(currCal, events); // parse the current month
+            parseMonth(currCal, events); // parse the current month
 
-        // parse the next month (current and next month are needed for the app)
-        currCal.add(Calendar.MONTH, 1);
-        parseMonth(currCal, events);
+            // parse the next month (current and next month are needed for the app)
+            currCal.add(Calendar.MONTH, 1);
+            parseMonth(currCal, events);
 
-        // events wont log for some reason
+            // events wont log for some reason
+            // add a loading thing while these two things are running?
+        } else {
+            getEvents(events);
+        }
         calendarView.setEvents(events); // add cell labels to calendar
+
         drawerLayout.invalidate();
+        drawerLayout.requestLayout();
 
         // when a specific day is tapped, open a page for it
         calendarView.setOnDayClickListener(this::launchDay);
+
+        notifSwitch.setOnCheckedChangeListener(this::onCheckedChanged);
     }
 
     // set minimum and maximum date for calendar
@@ -145,6 +163,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void getEvents(List<EventDay> events) {
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences("biodynamiccalendar_DAYTYPES", Context.MODE_PRIVATE);
+        Map<String, ?> allEntries = sharedPrefs.getAll();
+        allEntries.remove("written");
+
+        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+            String[] parts = entry.getKey().split("-");
+            Calendar calendar = Calendar.getInstance(); // get current date
+            calendar.set(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]) - 1, Integer.parseInt(parts[2]));
+            int val =(int) entry.getValue();
+            labelCell(events, calendar, val);
+        }
+    }
+
    // launch clicked day
     private void launchDay(EventDay eventDay) {
         // get clicked day's calendar values
@@ -172,6 +204,21 @@ public class MainActivity extends AppCompatActivity {
     // launch about activity
     public void clickHelp(View view) {
         startActivity(new Intent(MainActivity.this, AboutActivity.class));
+    }
+
+    // edit name, icon, text, has to save the state of the switch, and this should be a notif once a day with alarms
+    public void onCheckedChanged (CompoundButton buttonView, boolean isChecked) {
+        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        NotificationChannel channel = new NotificationChannel("DAILY", "Daily Notifications", NotificationManager.IMPORTANCE_DEFAULT);
+        notificationManager.createNotificationChannel(channel);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this, "DAILY")
+                .setContentTitle("Good Morning!")
+                .setContentText("blabla")
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setAutoCancel(true);
+        if (isChecked) {
+            notificationManager.notify(1, builder.build());
+        }
     }
 
     // sign out current user
@@ -205,6 +252,23 @@ public class MainActivity extends AppCompatActivity {
         String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
 
         return new String[] {year, month, day};
+    }
+
+    static void labelCell(List<EventDay> events, Calendar calendar, int daytype) {
+        switch (daytype) {
+            case 1:
+                events.add(new EventDay(calendar, R.drawable.event_root));
+                break;
+            case 2:
+                events.add(new EventDay(calendar, R.drawable.event_flower));
+                break;
+            case 3:
+                events.add(new EventDay(calendar, R.drawable.event_leaf));
+                break;
+            case 4:
+                events.add(new EventDay(calendar, R.drawable.event_fruit));
+                break;
+        }
     }
 }
 
@@ -261,16 +325,20 @@ class Request implements Runnable {
 
             if (constArray[a].equals(constValue)) {
                 if (a <= 2) {
-                    events.add(new EventDay(calendar, R.drawable.event_root));
+                    // events.add(new EventDay(calendar, R.drawable.event_root));
+                    MainActivity.labelCell(events, calendar, 1);
                     writeToPrefs(1);
                 } else if (a <= 5) {
-                    events.add(new EventDay(calendar, R.drawable.event_flower));
+                    // events.add(new EventDay(calendar, R.drawable.event_flower));
+                    MainActivity.labelCell(events, calendar, 2);
                     writeToPrefs(2);
                 } else if (a <= 9) {
-                    events.add(new EventDay(calendar, R.drawable.event_leaf));
+                    // events.add(new EventDay(calendar, R.drawable.event_leaf));
+                    MainActivity.labelCell(events, calendar, 3);
                     writeToPrefs(3);
                 } else {
-                    events.add(new EventDay(calendar, R.drawable.event_fruit));
+                    // events.add(new EventDay(calendar, R.drawable.event_fruit));
+                    MainActivity.labelCell(events, calendar, 4);
                     writeToPrefs(4);
                 }
                 return;
@@ -281,7 +349,6 @@ class Request implements Runnable {
     // writes day type to shared preferences
     private void writeToPrefs(int type) {
         SharedPreferences sharedPrefs = context.getSharedPreferences("biodynamiccalendar_DAYTYPES", Context.MODE_PRIVATE);
-        // maybe make it check the timestamp too
         if (!sharedPrefs.contains(dates[0] + "-" + dates[1] + "-" + i)) {
             sharedPrefs.edit().putInt(dates[0] + "-" + dates[1] + "-" + i, type).commit();
         }
