@@ -1,20 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Biodynamic Calendar</string>
+    <string name="app_name">Biodinamiskais Kalendārs</string>
     <string name="auth_failure">Authentication failed</string>
-    <string name="help">About</string>
+    <string name="help">Par</string>
     <string name="notif_alert">Please enable notifications for this app in settings!</string>
     <string-array name="languages_array">
-        <item>Choose Language</item>
+        <item>Izvēlēties valodu</item>
         <item>English</item>
         <item>Latviešu</item>
     </string-array>
-    <string name="sign_out">Sign Out</string>
+    <string name="sign_out">Izrakstīties</string>
     <string name="sign_out_body">Are you sure you want to sign out?</string>
-    <string name="negative">NO</string>
-    <string name="positive">YES</string>
+    <string name="negative">NĒ</string>
+    <string name="positive">JĀ</string>
     <string name="notes">Add note…</string>
     <string name="notes_err">Field is empty!</string>
-    <string name="note_btn">Save</string>
+    <string name="note_btn">Saglabāt</string>
     <string name="note_success">Note added!</string>
     <string name="note_failure">Something went wrong, please try again!</string>
     <string name="about">
@@ -47,25 +48,25 @@
     <string name="flower_emoji">&#127800;</string>
     <string name="leaf_emoji">&#127811;</string>
     <string name="fruit_emoji">&#58181;</string>
-    <string name="material_calendar_monday">M</string>
-    <string name="material_calendar_tuesday">T</string>
-    <string name="material_calendar_wednesday">W</string>
-    <string name="material_calendar_thursday">T</string>
-    <string name="material_calendar_friday">F</string>
+    <string name="material_calendar_monday">P</string>
+    <string name="material_calendar_tuesday">O</string>
+    <string name="material_calendar_wednesday">T</string>
+    <string name="material_calendar_thursday">C</string>
+    <string name="material_calendar_friday">Pk</string>
     <string name="material_calendar_saturday">S</string>
-    <string name="material_calendar_sunday">S</string>
+    <string name="material_calendar_sunday">Sv</string>
     <array name="material_calendar_months_array">
-        <item>January</item>
-        <item>February</item>
-        <item>March</item>
-        <item>April</item>
-        <item>May</item>
-        <item>June</item>
-        <item>July</item>
-        <item>August</item>
-        <item>September</item>
-        <item>October</item>
-        <item>November</item>
-        <item>December</item>
+        <item>Janvāris</item>
+        <item>Februāris</item>
+        <item>Marts</item>
+        <item>Aprīlis</item>
+        <item>Maijs</item>
+        <item>Jūnijs</item>
+        <item>Jūlijs</item>
+        <item>Augusts</item>
+        <item>Septembris</item>
+        <item>Oktobris</item>
+        <item>Novembris</item>
+        <item>Decembris</item>
     </array>
 </resources>

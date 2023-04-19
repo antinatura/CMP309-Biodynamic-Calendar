@@ -3,7 +3,7 @@
     <item>
         <bitmap
             android:gravity="top|left"
-            android:tint="@android:color/holo_green_light"
+            android:tint="@color/leaf"
             android:src="@drawable/leaf" />
     </item>
 </layer-list>

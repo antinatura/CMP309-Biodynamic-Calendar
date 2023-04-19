@@ -19,8 +19,8 @@
             android:id="@+id/calendarView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:headerColor="@color/purple_500"
-            app:todayLabelColor="@color/teal_200"
+            app:headerColor="@color/green_1"
+            app:todayLabelColor="@color/lilac_1"
             app:firstDayOfWeek="monday"/>
         
     </LinearLayout>

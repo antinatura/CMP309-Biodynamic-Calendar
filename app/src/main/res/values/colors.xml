@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- change these-->
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
+    <color name="lilac_1">#D72b85</color>
+    <color name="lilac_2">#713253</color>
+    <color name="lilac_3">#482035</color>
+    <color name="green_1">#354820</color>
+    <color name="green_2">#283618</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="root">#895c00</color>
-    <color name="flower">@android:color/holo_red_light</color>
-    <color name="leaf">@android:color/holo_green_light</color>
-    <color name="fruit">@android:color/holo_orange_light</color>
+    <color name="root">#A76021</color>
+    <color name="flower">#E95A5A</color>
+    <color name="leaf">#85A527</color>
+    <color name="fruit">#EFB643</color>
 </resources>

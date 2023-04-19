@@ -7,6 +7,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -14,11 +15,16 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +47,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
@@ -88,6 +95,35 @@ public class MainActivity extends AppCompatActivity {
         // apply the saved notification switch state
         SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences("biodynamiccalendar_NOTIFSETTINGS", Context.MODE_PRIVATE);
         notifSwitch.setChecked(sharedPrefs.getBoolean("state",false));
+
+        Spinner spinner = findViewById(R.id.language_spinner);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.languages_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
+        spinner.setSelection(0);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String lang = adapterView.getItemAtPosition(i).toString();
+                if (lang.equals("English")) {
+                    setLocale(MainActivity.this, "en");
+                    startActivity(getIntent());
+                    finish();
+                } else if (lang.equals("Latviešu")) {
+                    setLocale(MainActivity.this, "lv");
+                    startActivity(getIntent());
+                    finish();
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
+        });
 
         setLimits(calendarView); // set minimum and maximum date for calendarView
 
@@ -236,12 +272,13 @@ public class MainActivity extends AppCompatActivity {
             sharedPrefs.edit().putBoolean("state", true).apply();
             Calendar calendar = Calendar.getInstance();
             // check if time has already passed
-//            if (calendar.get(Calendar.HOUR_OF_DAY) >= 10) {
-//                calendar.add(Calendar.DATE,1); // add a day to the calendar
-//            }
+            if (calendar.get(Calendar.HOUR_OF_DAY) >= 10) {
+                calendar.add(Calendar.DATE,1); // add a day to the calendar
+            }
             calendar.set(Calendar.HOUR_OF_DAY, 10);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
+            // calendar.add(Calendar.MINUTE, 2);
             alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
         } else {
             sharedPrefs.edit().putBoolean("state", false).apply();
@@ -263,6 +300,15 @@ public class MainActivity extends AppCompatActivity {
             finish();
         });
         builder.show();
+    }
+
+    private void setLocale(Activity activity, String lang) {
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+        Resources resources = activity.getResources();
+        Configuration config = resources.getConfiguration();
+        config.setLocale(locale);
+        resources.updateConfiguration(config, resources.getDisplayMetrics());
     }
 
     // date format function

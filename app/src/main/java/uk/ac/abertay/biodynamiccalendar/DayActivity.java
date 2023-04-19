@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -134,7 +133,7 @@ public class DayActivity extends AppCompatActivity {
     // appbar color based on day type
     private void colorAppbar(int dayType) {
         LinearLayout toolbar = findViewById(R.id.appbar_sub);
-        int color = ContextCompat.getColor(this, R.color.purple_500);
+        int color = ContextCompat.getColor(this, R.color.green_1);
 
         switch (dayType) {
             case 1:

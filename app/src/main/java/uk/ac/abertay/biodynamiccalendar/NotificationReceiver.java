@@ -29,16 +29,16 @@ public class NotificationReceiver extends BroadcastReceiver {
         int dayType = sharedPrefs.getInt(String.valueOf(currentDate), -1);
         switch(dayType) {
             case 1:
-                text.set(context.getString(R.string.today_is) + context.getString(R.string.root) + ".");
+                text.set(context.getString(R.string.today_is) + context.getString(R.string.root) + ". " + context.getString(R.string.root_emoji));
                 break;
             case 2:
-                text.set(context.getString(R.string.today_is) + context.getString(R.string.flower) + ".");
+                text.set(context.getString(R.string.today_is) + context.getString(R.string.flower) + ". " + context.getString(R.string.flower_emoji));
                 break;
             case 3:
-                text.set(context.getString(R.string.today_is) + context.getString(R.string.leaf) + ".");
+                text.set(context.getString(R.string.today_is) + context.getString(R.string.leaf) + ". " + context.getString(R.string.leaf_emoji));
                 break;
             case 4:
-                text.set(context.getString(R.string.today_is) + context.getString(R.string.fruit) + ".");
+                text.set(context.getString(R.string.today_is) + context.getString(R.string.fruit) + ". " + context.getString(R.string.fruit_emoji));
                 break;
             default:
                 DocumentReference fullNewMoons = db.document("/moonPhases/fullNewMoons");
@@ -57,11 +57,11 @@ public class NotificationReceiver extends BroadcastReceiver {
                 });
         }
 
-        // add launcher intents?
-        Intent notificationIntent = new Intent(context, SplashActivity.class);
-        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        // add launcher intents
+        Intent notifIntent = new Intent(context, SplashActivity.class);
+        notifIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notifIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "DAILY")
                 .setContentTitle(context.getString(R.string.notif_title))

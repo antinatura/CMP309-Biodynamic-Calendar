@@ -33,7 +33,7 @@ public class SplashActivity extends AppCompatActivity {
 
         // get day type shared preferences
         SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences("biodynamiccalendar_DAYTYPES", Context.MODE_PRIVATE);
-       // sharedPrefs.edit().clear().apply(); // deletes stuff for testing
+        sharedPrefs.edit().clear().apply(); // deletes stuff for testing
 
         // gets date from which saved day types start
         // rn main can handle this

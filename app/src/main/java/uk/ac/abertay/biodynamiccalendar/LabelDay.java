@@ -92,7 +92,7 @@ class LabelDay implements Runnable {
     private void writeToPrefs(int type) {
         SharedPreferences sharedPrefs = context.getSharedPreferences("biodynamiccalendar_DAYTYPES", Context.MODE_PRIVATE);
         if (!sharedPrefs.contains(dates[0] + "-" + dates[1] + "-" + i)) {
-            sharedPrefs.edit().putInt(dates[0] + "-" + dates[1] + "-" + i, type).commit();
+            sharedPrefs.edit().putInt(dates[0] + "-" + dates[1] + "-" + i, type).apply();
         }
     }
 }
