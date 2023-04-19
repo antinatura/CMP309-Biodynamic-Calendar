@@ -3,26 +3,25 @@ package uk.ac.abertay.biodynamiccalendar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
-import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.applandeo.materialcalendarview.CalendarView;
 import com.applandeo.materialcalendarview.EventDay;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -30,14 +29,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -89,6 +85,10 @@ public class MainActivity extends AppCompatActivity {
             email.setText(userEmail);
         }
 
+        // apply the saved notification switch state
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences("biodynamiccalendar_NOTIFSETTINGS", Context.MODE_PRIVATE);
+        notifSwitch.setChecked(sharedPrefs.getBoolean("state",false));
+
         setLimits(calendarView); // set minimum and maximum date for calendarView
 
         boolean rewrite = this.getIntent().getBooleanExtra("rewrite", false);
@@ -107,15 +107,27 @@ public class MainActivity extends AppCompatActivity {
         } else {
             getEvents(events);
         }
+        // getEvents(events);
         calendarView.setEvents(events); // add cell labels to calendar
-
-        drawerLayout.invalidate();
-        drawerLayout.requestLayout();
 
         // when a specific day is tapped, open a page for it
         calendarView.setOnDayClickListener(this::launchDay);
 
-        notifSwitch.setOnCheckedChangeListener(this::onCheckedChanged);
+        notifSwitch.setOnCheckedChangeListener(this::onSwitchChange);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // check for and redirect non signed in users
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            startActivity(new Intent(MainActivity.this, AuthActivity.class));
+            finish();
+        }
+        ViewGroup vg = findViewById(R.id.main_layout);
+        vg.requestLayout();
+        vg.invalidate();
     }
 
     // set minimum and maximum date for calendar
@@ -130,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
         calendarView.setMaximumDate(max);
     }
 
-    // starts runnables that will get day types for all days of a month
+    // starts threads that will get day types for all days of a month
     private void parseMonth(Calendar calendar, List<EventDay> events) {
         // getting Location makes the app slightly more accurate however it is not detrimental to the apps functionality
         // in the future getting a rough user location would be good
@@ -148,14 +160,12 @@ public class MainActivity extends AppCompatActivity {
             fullNewMoons.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        if(document.getString(dates[0] + "-" + dates[1] + "-" + finalI) == null){
-                            try {
-                                Request request = new Request(url, finalI, dates, events, this.getApplicationContext());
-                                new Thread(request).start();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                    if (document.exists() && document.getString(dates[0] + "-" + dates[1] + "-" + finalI) == null) {
+                        try {
+                            LabelDay newLabel = new LabelDay(url, finalI, dates, events, this.getApplicationContext());
+                            new Thread(newLabel).start();
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }
                 }
@@ -169,9 +179,9 @@ public class MainActivity extends AppCompatActivity {
         allEntries.remove("written");
 
         for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-            String[] parts = entry.getKey().split("-");
+            String[] date = entry.getKey().split("-");
             Calendar calendar = Calendar.getInstance(); // get current date
-            calendar.set(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]) - 1, Integer.parseInt(parts[2]));
+            calendar.set(Integer.parseInt(date[0]), Integer.parseInt(date[1]) - 1, Integer.parseInt(date[2]));
             int val =(int) entry.getValue();
             labelCell(events, calendar, val);
         }
@@ -207,27 +217,46 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // edit name, icon, text, has to save the state of the switch, and this should be a notif once a day with alarms
-    public void onCheckedChanged (CompoundButton buttonView, boolean isChecked) {
-        NotificationManager notificationManager = getSystemService(NotificationManager.class);
-        NotificationChannel channel = new NotificationChannel("DAILY", "Daily Notifications", NotificationManager.IMPORTANCE_DEFAULT);
-        notificationManager.createNotificationChannel(channel);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(MainActivity.this, "DAILY")
-                .setContentTitle("Good Morning!")
-                .setContentText("blabla")
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setAutoCancel(true);
+    public void onSwitchChange (CompoundButton buttonView, boolean isChecked) {
+        NotificationChannel channel = new NotificationChannel("DAILY", "Day types", NotificationManager.IMPORTANCE_DEFAULT);
+        channel.setDescription("Channel for daily day type notifications");
+
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences("biodynamiccalendar_NOTIFSETTINGS", Context.MODE_PRIVATE);
+        Intent intent = new Intent(MainActivity.this, NotificationReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         if (isChecked) {
-            notificationManager.notify(1, builder.build());
+            // ask for perms here if they are not granted? shouldn't ask bc they're normal?
+            if (!NotificationManagerCompat.from(this).areNotificationsEnabled()) {
+                Toast.makeText(this, R.string.notif_alert, Toast.LENGTH_SHORT).show();
+                SwitchCompat notifSwitch = findViewById(R.id.notifSwitch);
+                notifSwitch.setChecked(sharedPrefs.getBoolean("state",false));
+                return;
+            }
+            sharedPrefs.edit().putBoolean("state", true).apply();
+            Calendar calendar = Calendar.getInstance();
+            // check if time has already passed
+//            if (calendar.get(Calendar.HOUR_OF_DAY) >= 10) {
+//                calendar.add(Calendar.DATE,1); // add a day to the calendar
+//            }
+            calendar.set(Calendar.HOUR_OF_DAY, 10);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+        } else {
+            sharedPrefs.edit().putBoolean("state", false).apply();
+            if(alarmManager != null)
+                alarmManager.cancel(pendingIntent);
         }
     }
 
     // sign out current user
     public void clickSignout(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Sign Out");
-        builder.setMessage("Are You sure You want to sign out?");
-        builder.setNegativeButton("NO", (dialogInterface, i) -> dialogInterface.dismiss());
-        builder.setPositiveButton("YES", (dialogInterface, i) -> {
+        builder.setTitle(R.string.sign_out);
+        builder.setMessage(R.string.sign_out_body);
+        builder.setNegativeButton(R.string.negative, (dialogInterface, i) -> dialogInterface.dismiss());
+        builder.setPositiveButton(R.string.positive, (dialogInterface, i) -> {
             mAuth.signOut();
             gsc.signOut();
             startActivity(new Intent(MainActivity.this, AuthActivity.class));
@@ -239,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
     // date format function
     // mostly used to make life easier and prefix months before october with 0 and start them from 1
     // this is not possible with using the returned calendar values so complicates making API requests (among other things)
-    private String[] formatDate(Calendar calendar) {
+    static String[] formatDate(Calendar calendar) {
         // get values and format to strings (for displaying easier and API query formatting)
         String year = String.valueOf(calendar.get(Calendar.YEAR));
         String month;
@@ -249,7 +278,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             month = String.valueOf(calendar.get(Calendar.MONTH) + 1);
         }
-        String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+        String day = String.valueOf(calendar.get(Calendar.DATE));
 
         return new String[] {year, month, day};
     }
@@ -268,89 +297,6 @@ public class MainActivity extends AppCompatActivity {
             case 4:
                 events.add(new EventDay(calendar, R.drawable.event_fruit));
                 break;
-        }
-    }
-}
-
-// makes an API request and parses response
-class Request implements Runnable {
-    String url;
-    int i;
-    String[] dates;
-    List<EventDay> events;
-    Context context;
-    Request (String url, int i, String[] dates, List<EventDay> events, Context context) {
-        this.url = url;
-        this.i = i;
-        this.dates = dates;
-        this.events = events;
-        this.context = context;
-    }
-    @Override
-    public void run() {
-        try{
-            // make a request to visibleplanets API with volley
-            StringRequest stringRequest = new StringRequest(url, response -> {
-                try {
-                    JSONObject responseObject = new JSONObject(response);
-                    JSONArray responseArray = responseObject.getJSONArray("data");
-                    JSONObject moonArray = responseArray.getJSONObject(1);
-                    String constValue = moonArray.getString("constellation");
-                    parseResponse(constValue);
-
-                }  catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }, error -> {
-            });
-
-            // add the request to the RequestQueue
-            RequestQueue requestQueue = Volley.newRequestQueue(context);
-            requestQueue.add(stringRequest);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        // add error stuff
-    }
-
-    // labels days based on their type and writes result to shared preferences
-    private void parseResponse(String constValue){
-        // need to add Cetus to array
-        String[] constArray = {"Capricornus","Taurus", "Virgo", "Gemini", "Libra", "Aquarius", "Pisces", "Scorpius", "Cancer", "Ophiuchus", "Aries", "Sagittarius", "Leo"};
-
-        for (int a = 0; a < constArray.length; a++) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(Integer.parseInt(dates[0]), Integer.parseInt(dates[1]) - 1, i);
-
-            if (constArray[a].equals(constValue)) {
-                if (a <= 2) {
-                    // events.add(new EventDay(calendar, R.drawable.event_root));
-                    MainActivity.labelCell(events, calendar, 1);
-                    writeToPrefs(1);
-                } else if (a <= 5) {
-                    // events.add(new EventDay(calendar, R.drawable.event_flower));
-                    MainActivity.labelCell(events, calendar, 2);
-                    writeToPrefs(2);
-                } else if (a <= 9) {
-                    // events.add(new EventDay(calendar, R.drawable.event_leaf));
-                    MainActivity.labelCell(events, calendar, 3);
-                    writeToPrefs(3);
-                } else {
-                    // events.add(new EventDay(calendar, R.drawable.event_fruit));
-                    MainActivity.labelCell(events, calendar, 4);
-                    writeToPrefs(4);
-                }
-                return;
-            }
-        }
-    }
-
-    // writes day type to shared preferences
-    private void writeToPrefs(int type) {
-        SharedPreferences sharedPrefs = context.getSharedPreferences("biodynamiccalendar_DAYTYPES", Context.MODE_PRIVATE);
-        if (!sharedPrefs.contains(dates[0] + "-" + dates[1] + "-" + i)) {
-            sharedPrefs.edit().putInt(dates[0] + "-" + dates[1] + "-" + i, type).commit();
         }
     }
 }

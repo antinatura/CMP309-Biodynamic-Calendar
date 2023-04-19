@@ -19,6 +19,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.io.IOException;
+import java.net.InetAddress;
+
 public class AuthActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
@@ -51,6 +54,7 @@ public class AuthActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             startActivity(new Intent(AuthActivity.this, SplashActivity.class));
+            finish();
         }
     }
 
@@ -70,11 +74,10 @@ public class AuthActivity extends AppCompatActivity {
             try {
                 // success, authenticate with firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
-                Log.d("AUTH", "firebaseAuthWithGoogle:" + account.getId());
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
                 // failure
-                Toast.makeText(AuthActivity.this, "Google sign in failed.", Toast.LENGTH_LONG).show();
+                Toast.makeText(AuthActivity.this, R.string.auth_failure, Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -88,6 +91,6 @@ public class AuthActivity extends AppCompatActivity {
                     finish();
                 }).addOnFailureListener(this, e ->
                     // failure
-                    Toast.makeText(AuthActivity.this, "Firebase authentication failed.", Toast.LENGTH_LONG).show());
+                    Toast.makeText(AuthActivity.this, R.string.auth_failure, Toast.LENGTH_LONG).show());
     }
 }

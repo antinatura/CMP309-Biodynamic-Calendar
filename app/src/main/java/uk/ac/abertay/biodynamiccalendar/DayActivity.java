@@ -51,7 +51,7 @@ public class DayActivity extends AppCompatActivity {
         submit.setOnClickListener(view -> {
            String note = input.getText().toString();
             if (TextUtils.isEmpty(note)) {
-                input.setError("Field is empty!");
+                input.setError(getString(R.string.notes_err));
             } else {
                 addNote(dateVals[0] + "-" + dateVals[1] + "-" + dateVals[2], note);
             }
@@ -82,8 +82,8 @@ public class DayActivity extends AppCompatActivity {
         docData.put("note", note);
 
         dbNotes.set(docData).addOnSuccessListener(unused ->
-                Toast.makeText(DayActivity.this, "Note Added!", Toast.LENGTH_SHORT).show()).addOnFailureListener(e ->
-                    Toast.makeText(DayActivity.this, "Something went wrong, please try again: \n" + e, Toast.LENGTH_SHORT).show());
+                Toast.makeText(this, R.string.note_success, Toast.LENGTH_SHORT).show()).addOnFailureListener(e ->
+                    Toast.makeText(this, R.string.note_failure, Toast.LENGTH_SHORT).show());
     }
 
     // displays date and day type, changed appbar color

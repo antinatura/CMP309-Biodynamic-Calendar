@@ -1,9 +1,18 @@
 <resources>
     <string name="app_name">Biodynamic Calendar</string>
+    <string name="auth_failure">Authentication failed</string>
+    <string name="progress">Getting day types, please wait/refresh…</string>
     <string name="help">About</string>
+    <string name="notif_alert">Please enable notifications for this app in settings!</string>
     <string name="sign_out">Sign Out</string>
+    <string name="sign_out_body">Are you sure you want to sign out?</string>
+    <string name="negative">NO</string>
+    <string name="positive">YES</string>
     <string name="notes">Add note…</string>
+    <string name="notes_err">Field is empty!</string>
     <string name="note_btn">Save</string>
+    <string name="note_success">Note added!</string>
+    <string name="note_failure">Something went wrong, please try again!</string>
     <string name="about">
         <![CDATA[
         <p>Based on the principles of biodynamic agriculture, which emphasizes the importance of harmonizing with nature and the cosmos, the biodynamic calendar is a tool used by gardeners and farmers to plan and organize activities according to the moon phase and its location in the sky. It provides guidance on when to plant, harvest, and carry out other tasks.</p>
@@ -23,6 +32,10 @@
     <string name="flower">Flower Day</string>
     <string name="leaf">Leaf Day</string>
     <string name="fruit">Fruit Day</string>
-    <string name="full_moon">&#127765;</string>
-    <string name="new_moon">&#127761;</string>
+    <string name="full_moon">Full Moon</string>
+    <string name="new_moon">New Moon</string>
+    <string name="notif_title">Good Morning!</string>
+    <string name="today_is">Today is&#160;</string>
+    <string name="full_moon_notif">"Today the moon is full. Time for a break :)"</string>
+    <string name="new_moon_notif">"Today the moon is new. Time for a break :)"</string>
 </resources>
