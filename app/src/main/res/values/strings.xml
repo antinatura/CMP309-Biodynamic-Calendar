@@ -21,15 +21,15 @@
     <string name="note_failure">Something went wrong, please try again!</string>
     <string name="about">
         <![CDATA[
-        <p>Based on the principles of biodynamic agriculture, which emphasizes the importance of harmonizing with nature and the cosmos, the biodynamic calendar is a tool used by gardeners and farmers to plan and organize activities according to the moon phase and its location in the sky. It provides guidance on when to plant, harvest, and carry out other tasks.</p>
-        <p>Each day in the calendar is associated with a particular aspect of plant growth, such as root development or fruiting and this information is used to determine the best times for various gardening activities. These days are determined based on the moon phase and the element of the zodiac sign whose constellation it is in.</p>
+        <p>Based on the principles of biodynamic agriculture, which emphasizes the importance of harmonizing with nature and the cosmos, the biodynamic calendar is a tool used by gardeners and farmers to plan gardening activities according to the moon phase and its location in the sky.</p>
+        <p>Each day in the calendar is associated with a particular aspect of plant growth, such as root or fruit development and this information is used to determine the best times for various gardening activities. These days are determined based on the moon phase and the element of the zodiac sign whose constellation it is in on a particular day.</p>
 
         <p><b>Root days</b> - focuses on root crops like potatoes and carrots.</p>
         <p><b>Flower days</b> - focuses on cultivating flowers, flowering herbs, hedges, and trees.</p>
         <p><b>Leaf days</b> - focuses on leafy plants such as salads and cabbages as well as grass or non flowering hedges.</p>
         <p><b>Fruit days</b> - focuses on all fruits as well as all non-root vegetables.</p>
 
-        <p>During full and new moons any gardening activities should be paused, therefore these days are not labelled.</p>
+        <p>During full and new moons gardening activities should be taken a break from, therefore these days are not labelled.</p>
 
         <p><u>Ance Strazdina, CMP309, 2023</u></p>
         ]]>
@@ -42,8 +42,8 @@
     <string name="new_moon">New Moon</string>
     <string name="notif_title">Good Morning!</string>
     <string name="today_is">Today is&#160;</string>
-    <string name="full_moon_notif">"Today the moon is full. &#127765; Time for a break &#128522;"</string>
-    <string name="new_moon_notif">"Today the moon is new. &#127761; Time for a break &#128522;"</string>
+    <string name="full_moon_notif">"Today the moon is full. &#127765; Time for a break! &#128522;"</string>
+    <string name="new_moon_notif">"Today the moon is new. &#127761; Time for a break! &#128522;"</string>
     <string name="root_emoji">&#129365;</string>
     <string name="flower_emoji">&#127800;</string>
     <string name="leaf_emoji">&#127811;</string>

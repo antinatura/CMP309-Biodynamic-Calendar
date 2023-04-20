@@ -7,7 +7,7 @@
     tools:context=".SplashActivity">
 
     <ProgressBar
-        android:indeterminateTint="@color/lilac_1"
+        android:indeterminateTint="@color/white"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

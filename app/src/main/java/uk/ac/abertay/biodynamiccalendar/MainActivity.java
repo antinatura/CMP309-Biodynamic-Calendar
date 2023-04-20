@@ -49,6 +49,7 @@ import java.util.Locale;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
+
     static DrawerLayout drawerLayout;
     private FirebaseAuth mAuth;
     private GoogleSignInClient gsc;
@@ -60,14 +61,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // same as auth activity
+        // google and firebase authentication
         mAuth = FirebaseAuth.getInstance();
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .build();
         gsc = GoogleSignIn.getClient(this, gso);
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this); // get google profile information
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
 
         // moon phase document from firestore
         db = FirebaseFirestore.getInstance();
@@ -100,10 +101,12 @@ public class MainActivity extends AppCompatActivity {
         spinner.setAdapter(adapter);
         spinner.setSelection(0);
 
+        // called on spinner selection
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 String lang = adapterView.getItemAtPosition(i).toString();
+
                 if (lang.equals("English")) {
                     setLocale(MainActivity.this, "en");
                     startActivity(getIntent());
@@ -123,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
 
         boolean rewrite = this.getIntent().getBooleanExtra("rewrite", false);
         List<EventDay> events = Collections.synchronizedList(new ArrayList<>()); // initialise array list to store cell labels
+
         if (rewrite) {
             Calendar currCal = Calendar.getInstance(); // get current date
             parseMonth(currCal, events); // parse the current month
@@ -135,16 +139,11 @@ public class MainActivity extends AppCompatActivity {
 
         calendarView.setEvents(events); // add cell labels to calendar
 
-//        if (events.size() == 0) {
-//            Toast.makeText(this, R.string.note_failure, Toast.LENGTH_LONG).show();
-//        }
-
         calendarView.setOnDayClickListener(this::launchDay); // when a specific day is tapped, open a page for it
-        notifSwitch.setOnCheckedChangeListener(this::onSwitchChange); // enable notifications switch
+        notifSwitch.setOnCheckedChangeListener(this::onSwitchChange); // called when notification switch changes state
     }
 
     // set minimum and maximum date for calendar
-    // this size is very small but improves performance and a large timespan is not needed for the app
     private void setLimits(CalendarView calendarView) {
         Calendar min = Calendar.getInstance();
         Calendar max = Calendar.getInstance();
@@ -157,13 +156,13 @@ public class MainActivity extends AppCompatActivity {
 
     // starts threads that will get day types for all days of a month
     private void parseMonth(Calendar calendar, List<EventDay> events) {
-        // getting Location makes the app slightly more accurate however it is not detrimental to the apps functionality
-        // in the future getting a rough user location would be good
+        // get location
         String latitude = "56.462002";
         String longitude = "-2.970700";
 
         String[] dates = formatDate(calendar);
-        YearMonth yearMonthObject = YearMonth.of(Integer.parseInt(dates[0]), Integer.parseInt(dates[1])); // month object to determine how many days in it
+        YearMonth yearMonthObject = YearMonth.of(Integer.parseInt(dates[0]), Integer.parseInt(dates[1])); // month object to determine how many days are in it
+
         for (int i = 1; i <= yearMonthObject.lengthOfMonth(); i++) {
             int finalI = i;
             String iso8601 = dates[0] + dates[1] + i + "T100000"; // iso8601 timestamp for API request. set to 10am
@@ -186,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // gets events from shared preferences
     private void getEvents(List<EventDay> events) {
         SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences("biodynamiccalendar_DAYTYPES", Context.MODE_PRIVATE);
         Map<String, ?> allEntries = sharedPrefs.getAll();
@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
 
         for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
             String[] date = entry.getKey().split("-");
-            Calendar calendar = Calendar.getInstance(); // get current date
+            Calendar calendar = Calendar.getInstance();
             calendar.set(Integer.parseInt(date[0]), Integer.parseInt(date[1]) - 1, Integer.parseInt(date[2]));
             int val =(int) entry.getValue();
             labelCell(events, calendar, val);
@@ -202,14 +202,11 @@ public class MainActivity extends AppCompatActivity {
 
    // launch clicked day
     private void launchDay(EventDay eventDay) {
-        // get clicked day's calendar values
-        Date clickedDay = eventDay.getCalendar().getTime();
+        Date clickedDay = eventDay.getCalendar().getTime(); // get clicked day's calendar values
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(clickedDay);
-
         Intent intent = new Intent(MainActivity.this, DayActivity.class);
-        // passes day, month, year to DayActivity
-        intent.putExtra("extras",  formatDate(calendar));
+        intent.putExtra("extras",  formatDate(calendar)); // passes day, month, year to DayActivity
         startActivity(intent);
     }
 
@@ -229,15 +226,19 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(MainActivity.this, AboutActivity.class));
     }
 
-    // edit name, icon, text, has to save the state of the switch, and this should be a notif once a day with alarms
+    // notification switch
     public void onSwitchChange (CompoundButton buttonView, boolean isChecked) {
+        // notification channel
         NotificationChannel channel = new NotificationChannel("DAILY", "Day types", NotificationManager.IMPORTANCE_DEFAULT);
         channel.setDescription("Channel for daily day type notifications");
 
-        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences("biodynamiccalendar_APPSETTINGS", Context.MODE_PRIVATE);
+        // create intents
         Intent intent = new Intent(MainActivity.this, NotificationReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences("biodynamiccalendar_APPSETTINGS", Context.MODE_PRIVATE); // stores switch state
+
         if (isChecked) {
             // check if app can send notifications
             if (!NotificationManagerCompat.from(this).areNotificationsEnabled()) {
@@ -246,21 +247,25 @@ public class MainActivity extends AppCompatActivity {
                 notifSwitch.setChecked(sharedPrefs.getBoolean("notifstate",false));
                 return;
             }
+
             sharedPrefs.edit().putBoolean("notifstate", true).apply();
             Calendar calendar = Calendar.getInstance();
             // check if time has already passed
             if (calendar.get(Calendar.HOUR_OF_DAY) >= 10) {
                 calendar.add(Calendar.DATE,1); // add a day to the calendar
             }
+
             // set to 10am
             calendar.set(Calendar.HOUR_OF_DAY, 10);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent); // set repeating notifications
+
         } else {
             sharedPrefs.edit().putBoolean("notifstate", false).apply();
             if(alarmManager != null)
-                alarmManager.cancel(pendingIntent);
+                alarmManager.cancel(pendingIntent); // cancel notifications
         }
     }
 
@@ -279,6 +284,7 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
+    // change app language
     static void setLocale(Activity activity, String lang) {
         Locale locale = new Locale(lang);
         // save locale
@@ -289,15 +295,14 @@ public class MainActivity extends AppCompatActivity {
         resources.updateConfiguration(config, resources.getDisplayMetrics());
     }
 
-    // date format function
-    // mostly used to make life easier and prefix months before october with 0 and start them from 1
-    // this is not possible with using the returned calendar values so complicates making API requests (among other things)
+    // date from calendar format function
+    // note: sometimes needs to be recast to int or subtract 1 from month, but generally makes it easier to work with dates
     static String[] formatDate(Calendar calendar) {
-        // get values and format to strings (for displaying easier and API query formatting)
         String year = String.valueOf(calendar.get(Calendar.YEAR));
         String month;
+
         if (calendar.get(Calendar.MONTH) < 9) {
-            //  prefix with 0 if month is a single digit (also for API query formatting)
+            //  prefix with 0 if month is a single digit
             month = "0" + (calendar.get(Calendar.MONTH) + 1);
         } else {
             month = String.valueOf(calendar.get(Calendar.MONTH) + 1);
@@ -307,6 +312,7 @@ public class MainActivity extends AppCompatActivity {
         return new String[] {year, month, day};
     }
 
+    // label cells
     static void labelCell(List<EventDay> events, Calendar calendar, int daytype) {
         switch (daytype) {
             case 1:

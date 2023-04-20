@@ -19,14 +19,19 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class NotificationReceiver extends BroadcastReceiver {
 
-    @SuppressLint("MissingPermission") // checks for permissions elsewhere
+    @SuppressLint("MissingPermission") // permissions are checked elsewhere
     @Override
     public void onReceive (Context context, Intent intent){
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         AtomicReference<String> text = new AtomicReference<>("");
         LocalDate currentDate = LocalDate.now();
+
+        // get stored daytypes
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         SharedPreferences sharedPrefs = context.getSharedPreferences("biodynamiccalendar_DAYTYPES", Context.MODE_PRIVATE);
+
         int dayType = sharedPrefs.getInt(String.valueOf(currentDate), -1);
+
+        // set notification text
         switch(dayType) {
             case 1:
                 text.set(context.getString(R.string.today_is) + context.getString(R.string.root) + ". " + context.getString(R.string.root_emoji));
@@ -57,12 +62,12 @@ public class NotificationReceiver extends BroadcastReceiver {
                 });
         }
 
-        // launcher intents
+        // notification intents
         Intent notifIntent = new Intent(context, SplashActivity.class);
         notifIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notifIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        // build notification
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "DAILY")
                 .setContentTitle(context.getString(R.string.notif_title))
                 .setContentText(text.get())
@@ -71,7 +76,6 @@ public class NotificationReceiver extends BroadcastReceiver {
                 .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        notificationManager.notify(111, builder.build());
+        notificationManager.notify(111, builder.build()); // notify
     }
 }

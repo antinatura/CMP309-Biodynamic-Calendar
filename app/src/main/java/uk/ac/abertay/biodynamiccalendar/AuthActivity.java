@@ -20,14 +20,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-import java.io.IOException;
-import java.net.InetAddress;
 
 public class AuthActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient gsc;
-    private static final int RC_SIGN_IN = 60; //
+    private static final int RC_SIGN_IN = 60;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,24 +38,10 @@ public class AuthActivity extends AppCompatActivity {
                 .requestEmail()
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .build();
-        gsc = GoogleSignIn.getClient(this, gso); // build a sign in client with previously configured options
+        gsc = GoogleSignIn.getClient(this, gso); // build a sign in client
 
         SignInButton signIn = findViewById(R.id.googleAuth);
-//        TextView textView = (TextView) signIn.getChildAt(0);
-//        textView.setText(R.string.google_button);
-
         signIn.setOnClickListener(view -> signIn()); // on sign in button click, start google sign in
-    }
-
-    @Override
-     public void onStart() {
-        super.onStart();
-        // check for and redirect signed in users
-//        FirebaseUser currentUser = mAuth.getCurrentUser();
-//        if (currentUser != null) {
-//            startActivity(new Intent(AuthActivity.this, SplashActivity.class));
-//            finish();
-//        }
     }
 
     // google sign in

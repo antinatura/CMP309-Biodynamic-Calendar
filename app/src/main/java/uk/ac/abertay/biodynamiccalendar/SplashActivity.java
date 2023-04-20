@@ -28,27 +28,30 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        // request perms (if needed). as of now those would be location
+        // request perms
         // check connectivity
         // find a way to make locale permanent
-        // comments
-        // deprecated methods
+        // fix deprecated methods?
+        // app icon
+        // other visuals? (notification drawable, more color edits, splash bg)
+        // cetus in array
 
         mAuth = FirebaseAuth.getInstance();
-        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences("biodynamiccalendar_DAYTYPES", Context.MODE_PRIVATE); // get day type shared preferences
 
-        // gets date from which saved day types start
-        // Main activity could handle this...
+        // put this in main?
+        // gets date from which saved days start
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences("biodynamiccalendar_DAYTYPES", Context.MODE_PRIVATE); // get day type shared preferences
         String writeTime = sharedPrefs.getString("written", null);
         LocalDate currentFirst = LocalDate.now().withDayOfMonth(1);
         rewrite = false;
+
         if (writeTime == null) {
             // first launch, add new date to start saved day types from
             sharedPrefs.edit().putString("written", String.valueOf(currentFirst)).apply();
             rewrite = true;
         } else {
             Map<String, ?> allEntries = sharedPrefs.getAll();
-            if (LocalDate.parse(writeTime).isEqual(currentFirst.minusMonths(1)) || allEntries.size() == 1 || true) {
+            if (LocalDate.parse(writeTime).isEqual(currentFirst.minusMonths(1)) || allEntries.size() == 1) {
                 // delete preferences and add new start date if a new month has begun since last update or if last update was unsuccessful
                 sharedPrefs.edit().clear().apply();
                 sharedPrefs.edit().putString("written", String.valueOf(currentFirst)).apply();
@@ -60,20 +63,21 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        // check for and redirect non signed in users
         FirebaseUser currentUser = mAuth.getCurrentUser();
         Handler handler = new Handler();
         handler.postDelayed(() -> {
             if (currentUser == null) {
+                // check for and redirect non signed in users
                 startActivity(new Intent(SplashActivity.this, AuthActivity.class));
                 finish();
             } else {
+                // launch the main activity
                 Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                 intent.putExtra("rewrite", rewrite);
                 startActivity(intent);
                 finish();
             }
-        }, 2000); // launch the main activity after 2 seconds, change this
+        }, 2000); // after 2 seconds wait time
     }
 }
 

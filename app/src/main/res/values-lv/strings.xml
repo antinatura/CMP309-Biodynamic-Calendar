@@ -12,7 +12,7 @@
         <item>Latviešu</item>
     </string-array>
     <string name="sign_out">Izrakstīšanās</string>
-    <string name="sign_out_body">Vai esiet pārliecināts, ka vēlaties izrakstīties?</string>
+    <string name="sign_out_body">Vai esat pārliecināts, ka vēlaties izrakstīties?</string>
     <string name="negative">NĒ</string>
     <string name="positive">JĀ</string>
     <string name="notes">Pievienot piezīmi…</string>
@@ -22,15 +22,15 @@
     <string name="note_failure">Kaut kas neizdevās, lūdzu mēģini vēlreiz!</string>
     <string name="about">
         <![CDATA[
-        <p>Balstīts uz biodinamiskās agrikulltūras, kas liek īpatsvaru uz harmoniju ar dabu un visumu, principiem, biodinamiskais kalendārs ir rīks, ko izmanto dārznieki un lauksaimnieki, lai plānotu un organizētu aktivitātes atkarībā no mēness fāzes un tā atrašanās vietas debesīs. Tas norāda, kad stādīt, ievākt ražu un veikt citus dārza darbus.</p>
-        <p>Katra kalendāra diena ir saistīta ar konkrētu augu augšanas aspektu, piemēram sakņu vai augļu attīstību un šī informācija palīdz noteikt labākos laikus dažādiem dārza darbiem. Šīs dienas tiek noteiktas pēc mēness fāzes un elementa tai zodiaka zīmei, kura zvaigznājā mēness atrodas dotajā dienā.</p>
+        <p>Balstīts uz biodinamiskās agrikulltūras, kas liek uzsvaru uz harmoniju ar dabu un visumu, principiem, biodinamiskais kalendārs ir rīks, ko izmanto dārznieki un lauksaimnieki, lai plānotu dārza darbus atkarībā no mēness fāzes un tā atrašanās vietas debesīs.</p>
+        <p>Katra kalendāra diena ir saistīta ar konkrētu augu augšanas aspektu, piemēram, sakņu vai augļu attīstību, un šī informācija palīdz noteikt labākos laikus dažādiem dārza darbiem. Šīs dienas tiek noteiktas pēc mēness fāzes un elementa tai zodiaka zīmei, kura zvaigznājā mēness atrodas dotajā dienā.</p>
 
         <p><b>Sakņu dienas</b> - pievērš uzmanību sakņaugiem kā kartupeļiem un burkāniem.</p>
         <p><b>Ziedu dienas</b> - pievērš uzmanību ziedaugu, ziedošu koku un krūmu kultivēšanai.</p>
         <p><b>Lapu dienas</b> - pievērš uzmanību lapaugiem kā salātiem, kāpostiem, zālei un neziedošiem krūmiem</p>
         <p><b>Augļu dienas</b> - pievērš uzmanību visiem augļiem un ne sakņu dārzeņiem</p>
 
-        <p>Pilnmēness un jauna mēness laikā, dārza darbus vajag pārtraukt, tāpēc šīm dienām nav marķējuma.</p>
+        <p>Pilnmēness un jauna mēness laikā, no dārza darbiem vajag atpūsties, tāpēc šīm dienām nav marķējuma.</p>
 
         <p><u>Ance Strazdiņa, CMP309, 2023</u></p>
         ]]>
@@ -43,8 +43,8 @@
     <string name="new_moon">Jauns Mēness</string>
     <string name="notif_title">Labrīt!</string>
     <string name="today_is">Šodien ir&#160;</string>
-    <string name="full_moon_notif">"Šodien mēness ir pilns. &#127765; Laiks atpūtai &#128522;"</string>
-    <string name="new_moon_notif">"Šodien mēness ir jauns. &#127761; Laiks atpūtai &#128522;"</string>
+    <string name="full_moon_notif">"Šodien mēness ir pilns. &#127765; Laiks atpūtai! &#128522;"</string>
+    <string name="new_moon_notif">"Šodien mēness ir jauns. &#127761; Laiks atpūtai! &#128522;"</string>
     <string name="root_emoji">&#129365;</string>
     <string name="flower_emoji">&#127800;</string>
     <string name="leaf_emoji">&#127811;</string>

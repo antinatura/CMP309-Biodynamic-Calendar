@@ -21,12 +21,14 @@ import java.util.List;
 
 // makes an API request and parses response
 class LabelDay implements Runnable {
+
     String url;
     int i;
     String[] dates;
     List<EventDay> events;
     Context context;
     Activity activity;
+
     LabelDay (String url, int i, String[] dates, List<EventDay> events, Context context, Activity activity) {
         this.url = url;
         this.i = i;
@@ -56,24 +58,21 @@ class LabelDay implements Runnable {
                 }
             }, Throwable::printStackTrace);
 
-            // add the request to the RequestQueue
             RequestQueue requestQueue = Volley.newRequestQueue(context);
             requestQueue.add(stringRequest);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    // labels days based on their type and writes result to shared preferences
+    // finds day types based on constellation returned by the API
     private void parseResponse(String constValue){
-        // need to add Cetus to array
         String[] constArray = {"Capricornus","Taurus", "Virgo", "Gemini", "Libra", "Aquarius", "Pisces", "Scorpius", "Cancer", "Ophiuchus", "Aries", "Sagittarius", "Leo"};
 
         for (int a = 0; a < constArray.length; a++) {
             Calendar calendar = Calendar.getInstance();
             calendar.set(Integer.parseInt(dates[0]), Integer.parseInt(dates[1]) - 1, i);
-
+            // labels cell and saves its type to shared preferences
             if (constArray[a].equals(constValue)) {
                 if (a <= 2) {
                     MainActivity.labelCell(events, calendar, 1);
@@ -88,7 +87,7 @@ class LabelDay implements Runnable {
                     MainActivity.labelCell(events, calendar, 4);
                     writeToPrefs(4);
                 }
-                // start populating the fields
+                // populate fields on the UI thread for faster displaying
                 Handler handler = new Handler(Looper.getMainLooper());
                 handler.post(() -> {
                     CalendarView calendarView = activity.findViewById(R.id.calendarView);

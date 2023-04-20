@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.text.HtmlCompat;
 
 import android.os.Bundle;
-import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
 
@@ -15,7 +14,7 @@ public class AboutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
 
-        // get TextView and set text to HTML formatted about string
+        // get TextView and set text to an HTML formatted string resource
         TextView aboutTextView = findViewById(R.id.about);
         aboutTextView.setText(HtmlCompat.fromHtml(getString(R.string.about), HtmlCompat.FROM_HTML_MODE_LEGACY));
     }

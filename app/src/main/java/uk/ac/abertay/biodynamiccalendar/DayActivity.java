@@ -27,6 +27,7 @@ public class DayActivity extends AppCompatActivity {
 
     FirebaseAuth mAuth;
     FirebaseFirestore db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,14 +43,15 @@ public class DayActivity extends AppCompatActivity {
         EditText input = findViewById(R.id.notesInputEdit);
         Button submit = findViewById(R.id.submit);
 
-        formatDay(dateVals); // format date TextView and toolbar color
+        formatDay(dateVals); // format date TextView and appbar
         getNote(dateVals[0] + "-" + dateVals[1] + "-" + dateVals[2]); // get note from database if there is one
 
-        // add note on button click
+        // on button click add note
         submit.setOnClickListener(view -> {
            String note = input.getText().toString();
+
             if (TextUtils.isEmpty(note)) {
-                input.setError(getString(R.string.notes_err));
+                input.setError(getString(R.string.notes_err)); // no input supplied
             } else {
                 addNote(dateVals[0] + "-" + dateVals[1] + "-" + dateVals[2], note);
             }
@@ -60,7 +62,6 @@ public class DayActivity extends AppCompatActivity {
     private void getNote(String date){
         String uid = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
         DocumentReference dbNotes = db.document("/users/" + uid + "/notes/" + date);
-
         dbNotes.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
@@ -78,13 +79,12 @@ public class DayActivity extends AppCompatActivity {
         DocumentReference dbNotes = db.document("/users/" + uid + "/notes/" + date);
         Map<String, Object> docData = new HashMap<>();
         docData.put("note", note);
-
         dbNotes.set(docData).addOnSuccessListener(unused ->
                 Toast.makeText(this, R.string.note_success, Toast.LENGTH_SHORT).show()).addOnFailureListener(e ->
                     Toast.makeText(this, R.string.note_failure, Toast.LENGTH_SHORT).show());
     }
 
-    // displays date and day type, changed appbar color
+    // displays date and day type, changes appbar color
     private void formatDay(String[] dateVals) {
         TextView dateView = findViewById(R.id.date);
         String date = dateVals[2] + "/" + dateVals[1] + "/" + dateVals[0];
@@ -93,6 +93,7 @@ public class DayActivity extends AppCompatActivity {
         final TextView dayDesc = findViewById(R.id.dayDesc);
         SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("biodynamiccalendar_DAYTYPES", Context.MODE_PRIVATE);
         int dayType = sharedPref.getInt(dateVals[0] + "-" + dateVals[1] + "-" + dateVals[2], -1);
+
         switch (dayType) {
             case 1:
                 dayDesc.setText(R.string.root);
@@ -147,6 +148,7 @@ public class DayActivity extends AppCompatActivity {
                 color = ContextCompat.getColor(this, R.color.fruit);
                 break;
         }
+
         toolbar.setBackgroundColor(color);
     }
 
