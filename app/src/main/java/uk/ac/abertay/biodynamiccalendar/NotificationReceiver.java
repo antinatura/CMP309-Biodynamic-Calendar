@@ -57,7 +57,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                 });
         }
 
-        // add launcher intents
+        // launcher intents
         Intent notifIntent = new Intent(context, SplashActivity.class);
         notifIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 

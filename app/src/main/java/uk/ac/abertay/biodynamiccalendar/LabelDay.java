@@ -1,11 +1,15 @@
 package uk.ac.abertay.biodynamiccalendar;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.applandeo.materialcalendarview.CalendarView;
 import com.applandeo.materialcalendarview.EventDay;
 
 import org.json.JSONArray;
@@ -22,12 +26,14 @@ class LabelDay implements Runnable {
     String[] dates;
     List<EventDay> events;
     Context context;
-    LabelDay (String url, int i, String[] dates, List<EventDay> events, Context context) {
+    Activity activity;
+    LabelDay (String url, int i, String[] dates, List<EventDay> events, Context context, Activity activity) {
         this.url = url;
         this.i = i;
         this.dates = dates;
         this.events = events;
         this.context = context;
+        this.activity = activity;
     }
     @Override
     public void run() {
@@ -45,7 +51,7 @@ class LabelDay implements Runnable {
                     String constValue = moonArray.getString("constellation");
                     parseResponse(constValue);
 
-                }  catch (JSONException e) {
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }, Throwable::printStackTrace);
@@ -55,7 +61,6 @@ class LabelDay implements Runnable {
             requestQueue.add(stringRequest);
 
         } catch (Exception e) {
-            // internet thingy here
             e.printStackTrace();
         }
     }
@@ -83,6 +88,12 @@ class LabelDay implements Runnable {
                     MainActivity.labelCell(events, calendar, 4);
                     writeToPrefs(4);
                 }
+                // start populating the fields
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.post(() -> {
+                    CalendarView calendarView = activity.findViewById(R.id.calendarView);
+                    calendarView.setEvents(events);
+                });
                 return;
             }
         }

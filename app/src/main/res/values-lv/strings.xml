@@ -1,49 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Biodinamiskais Kalendārs</string>
-    <string name="auth_failure">Authentication failed</string>
+    <string name="google_button">Pierakstīties</string>
+    <string name="auth_failure">Autentifikācija neveiksmīga!</string>
     <string name="help">Par</string>
-    <string name="notif_alert">Please enable notifications for this app in settings!</string>
+    <string name="notifs">Ieslēgt paziņojumus</string>
+    <string name="notif_alert">Lūdzu atļauj aplikācijai sūtīt paziņojumus iestatījumos!</string>
     <string-array name="languages_array">
-        <item>Izvēlēties valodu</item>
+        <item>Valodas Maiņa</item>
         <item>English</item>
         <item>Latviešu</item>
     </string-array>
-    <string name="sign_out">Izrakstīties</string>
-    <string name="sign_out_body">Are you sure you want to sign out?</string>
+    <string name="sign_out">Izrakstīšanās</string>
+    <string name="sign_out_body">Vai esiet pārliecināts, ka vēlaties izrakstīties?</string>
     <string name="negative">NĒ</string>
     <string name="positive">JĀ</string>
-    <string name="notes">Add note…</string>
-    <string name="notes_err">Field is empty!</string>
+    <string name="notes">Pievienot piezīmi…</string>
+    <string name="notes_err">Lauciņš ir tukšs!</string>
     <string name="note_btn">Saglabāt</string>
-    <string name="note_success">Note added!</string>
-    <string name="note_failure">Something went wrong, please try again!</string>
+    <string name="note_success">Piezīme saglabāta!</string>
+    <string name="note_failure">Kaut kas neizdevās, lūdzu mēģini vēlreiz!</string>
     <string name="about">
         <![CDATA[
-        <p>Based on the principles of biodynamic agriculture, which emphasizes the importance of harmonizing with nature and the cosmos, the biodynamic calendar is a tool used by gardeners and farmers to plan and organize activities according to the moon phase and its location in the sky. It provides guidance on when to plant, harvest, and carry out other tasks.</p>
-        <p>Each day in the calendar is associated with a particular aspect of plant growth, such as root development or fruiting and this information is used to determine the best times for various gardening activities. These days are determined based on the moon phase and the element of the zodiac sign whose constellation it is in.</p>
+        <p>Balstīts uz biodinamiskās agrikulltūras, kas liek īpatsvaru uz harmoniju ar dabu un visumu, principiem, biodinamiskais kalendārs ir rīks, ko izmanto dārznieki un lauksaimnieki, lai plānotu un organizētu aktivitātes atkarībā no mēness fāzes un tā atrašanās vietas debesīs. Tas norāda, kad stādīt, ievākt ražu un veikt citus dārza darbus.</p>
+        <p>Katra kalendāra diena ir saistīta ar konkrētu augu augšanas aspektu, piemēram sakņu vai augļu attīstību un šī informācija palīdz noteikt labākos laikus dažādiem dārza darbiem. Šīs dienas tiek noteiktas pēc mēness fāzes un elementa tai zodiaka zīmei, kura zvaigznājā mēness atrodas dotajā dienā.</p>
 
-        <p><b>Root days</b> - focuses on root crops like potatoes and carrots.</p>
-        <p><b>Flower days</b> - focuses on cultivating flowers, flowering herbs, hedges, and trees.</p>
-        <p><b>Leaf days</b> - focuses on leafy plans such as salads, spinach, and cabbages as well as grass or non flowering hedges.</p>
-        <p><b>Fruit days</b> - focuses on all fruits as well as all non-root vegetables.</p>
+        <p><b>Sakņu dienas</b> - pievērš uzmanību sakņaugiem kā kartupeļiem un burkāniem.</p>
+        <p><b>Ziedu dienas</b> - pievērš uzmanību ziedaugu, ziedošu koku un krūmu kultivēšanai.</p>
+        <p><b>Lapu dienas</b> - pievērš uzmanību lapaugiem kā salātiem, kāpostiem, zālei un neziedošiem krūmiem</p>
+        <p><b>Augļu dienas</b> - pievērš uzmanību visiem augļiem un ne sakņu dārzeņiem</p>
 
-        <p>During full and new moons any gardening activities should be paused, therefore these days are not labelled.</p>
+        <p>Pilnmēness un jauna mēness laikā, dārza darbus vajag pārtraukt, tāpēc šīm dienām nav marķējuma.</p>
 
-        <p><u>Ance Strazdina, CMP309, 2023</u></p>
+        <p><u>Ance Strazdiņa, CMP309, 2023</u></p>
         ]]>
     </string>
-    <string name="root">Root Day</string>
-    <string name="flower">Flower Day</string>
-    <string name="leaf">Leaf Day</string>
-    <string name="fruit">Fruit Day</string>
-    <string name="full_moon">Full Moon</string>
-    <string name="new_moon">New Moon</string>
-    <string name="notif_title">Good Morning!</string>
-    <string name="today_is">Today is&#160;</string>
-    <string name="full_moon_notif">"Today the moon is full. &#127765; Time for a break &#128522;"</string>
-    <string name="new_moon_notif">"Today the moon is new. &#127761; Time for a break &#128522;"</string>
-    <!--add emojis :)-->
+    <string name="root">Sakņu Diena</string>
+    <string name="flower">Ziedu Diena</string>
+    <string name="leaf">Lapu Diena</string>
+    <string name="fruit">Augļu Diena</string>
+    <string name="full_moon">Pilns Mēness</string>
+    <string name="new_moon">Jauns Mēness</string>
+    <string name="notif_title">Labrīt!</string>
+    <string name="today_is">Šodien ir&#160;</string>
+    <string name="full_moon_notif">"Šodien mēness ir pilns. &#127765; Laiks atpūtai &#128522;"</string>
+    <string name="new_moon_notif">"Šodien mēness ir jauns. &#127761; Laiks atpūtai &#128522;"</string>
     <string name="root_emoji">&#129365;</string>
     <string name="flower_emoji">&#127800;</string>
     <string name="leaf_emoji">&#127811;</string>

@@ -36,8 +36,7 @@ public class DayActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        // get variables from extras
-        String[] dateVals = this.getIntent().getStringArrayExtra("extras");
+        String[] dateVals = this.getIntent().getStringArrayExtra("extras"); // get variables from extras
 
         // get layout elements
         EditText input = findViewById(R.id.notesInputEdit);
@@ -92,7 +91,6 @@ public class DayActivity extends AppCompatActivity {
         dateView.setText(date);
 
         final TextView dayDesc = findViewById(R.id.dayDesc);
-
         SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("biodynamiccalendar_DAYTYPES", Context.MODE_PRIVATE);
         int dayType = sharedPref.getInt(dateVals[0] + "-" + dateVals[1] + "-" + dateVals[2], -1);
         switch (dayType) {

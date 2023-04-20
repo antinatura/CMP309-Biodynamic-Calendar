@@ -19,7 +19,6 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
@@ -35,7 +34,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -69,8 +67,7 @@ public class MainActivity extends AppCompatActivity {
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .build();
         gsc = GoogleSignIn.getClient(this, gso);
-        // get google profile information
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this); // get google profile information
 
         // moon phase document from firestore
         db = FirebaseFirestore.getInstance();
@@ -82,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
         ImageView icon = findViewById(R.id.userIcon);
         TextView email = findViewById(R.id.userEmail);
         SwitchCompat notifSwitch = findViewById(R.id.notifSwitch);
+        Spinner spinner = findViewById(R.id.language_spinner);
 
         // populate profile picture and email with current user information
         if (acct != null) {
@@ -93,16 +91,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // apply the saved notification switch state
-        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences("biodynamiccalendar_NOTIFSETTINGS", Context.MODE_PRIVATE);
-        notifSwitch.setChecked(sharedPrefs.getBoolean("state",false));
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences("biodynamiccalendar_APPSETTINGS", Context.MODE_PRIVATE);
+        notifSwitch.setChecked(sharedPrefs.getBoolean("notifstate",false));
 
-        Spinner spinner = findViewById(R.id.language_spinner);
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.languages_array, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
+        // finalise the spinner
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.languages_array, R.layout.spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
         spinner.setSelection(0);
 
@@ -131,39 +125,22 @@ public class MainActivity extends AppCompatActivity {
         List<EventDay> events = Collections.synchronizedList(new ArrayList<>()); // initialise array list to store cell labels
         if (rewrite) {
             Calendar currCal = Calendar.getInstance(); // get current date
-
             parseMonth(currCal, events); // parse the current month
-
-            // parse the next month (current and next month are needed for the app)
+            // parse the next month
             currCal.add(Calendar.MONTH, 1);
             parseMonth(currCal, events);
-
-            // events wont log for some reason
-            // add a loading thing while these two things are running?
         } else {
             getEvents(events);
         }
-        // getEvents(events);
+
         calendarView.setEvents(events); // add cell labels to calendar
 
-        // when a specific day is tapped, open a page for it
-        calendarView.setOnDayClickListener(this::launchDay);
+//        if (events.size() == 0) {
+//            Toast.makeText(this, R.string.note_failure, Toast.LENGTH_LONG).show();
+//        }
 
-        notifSwitch.setOnCheckedChangeListener(this::onSwitchChange);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        // check for and redirect non signed in users
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser == null) {
-            startActivity(new Intent(MainActivity.this, AuthActivity.class));
-            finish();
-        }
-        ViewGroup vg = findViewById(R.id.main_layout);
-        vg.requestLayout();
-        vg.invalidate();
+        calendarView.setOnDayClickListener(this::launchDay); // when a specific day is tapped, open a page for it
+        notifSwitch.setOnCheckedChangeListener(this::onSwitchChange); // enable notifications switch
     }
 
     // set minimum and maximum date for calendar
@@ -198,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists() && document.getString(dates[0] + "-" + dates[1] + "-" + finalI) == null) {
                         try {
-                            LabelDay newLabel = new LabelDay(url, finalI, dates, events, this.getApplicationContext());
+                            LabelDay newLabel = new LabelDay(url, finalI, dates, events, this.getApplicationContext(), this);
                             new Thread(newLabel).start();
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -257,31 +234,31 @@ public class MainActivity extends AppCompatActivity {
         NotificationChannel channel = new NotificationChannel("DAILY", "Day types", NotificationManager.IMPORTANCE_DEFAULT);
         channel.setDescription("Channel for daily day type notifications");
 
-        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences("biodynamiccalendar_NOTIFSETTINGS", Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences("biodynamiccalendar_APPSETTINGS", Context.MODE_PRIVATE);
         Intent intent = new Intent(MainActivity.this, NotificationReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         if (isChecked) {
-            // ask for perms here if they are not granted? shouldn't ask bc they're normal?
+            // check if app can send notifications
             if (!NotificationManagerCompat.from(this).areNotificationsEnabled()) {
                 Toast.makeText(this, R.string.notif_alert, Toast.LENGTH_SHORT).show();
                 SwitchCompat notifSwitch = findViewById(R.id.notifSwitch);
-                notifSwitch.setChecked(sharedPrefs.getBoolean("state",false));
+                notifSwitch.setChecked(sharedPrefs.getBoolean("notifstate",false));
                 return;
             }
-            sharedPrefs.edit().putBoolean("state", true).apply();
+            sharedPrefs.edit().putBoolean("notifstate", true).apply();
             Calendar calendar = Calendar.getInstance();
             // check if time has already passed
             if (calendar.get(Calendar.HOUR_OF_DAY) >= 10) {
                 calendar.add(Calendar.DATE,1); // add a day to the calendar
             }
+            // set to 10am
             calendar.set(Calendar.HOUR_OF_DAY, 10);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
-            // calendar.add(Calendar.MINUTE, 2);
             alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
         } else {
-            sharedPrefs.edit().putBoolean("state", false).apply();
+            sharedPrefs.edit().putBoolean("notifstate", false).apply();
             if(alarmManager != null)
                 alarmManager.cancel(pendingIntent);
         }
@@ -302,8 +279,9 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
-    private void setLocale(Activity activity, String lang) {
+    static void setLocale(Activity activity, String lang) {
         Locale locale = new Locale(lang);
+        // save locale
         Locale.setDefault(locale);
         Resources resources = activity.getResources();
         Configuration config = resources.getConfiguration();

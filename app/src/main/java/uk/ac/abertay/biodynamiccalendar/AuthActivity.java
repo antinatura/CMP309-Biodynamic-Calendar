@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -33,17 +34,18 @@ public class AuthActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
 
-        // initialise firebase instance
-        mAuth = FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance(); // initialise firebase instance
         // configure google sign in options
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .build();
-        // build a sign in client with previously configured options
-        gsc = GoogleSignIn.getClient(this, gso);
+        gsc = GoogleSignIn.getClient(this, gso); // build a sign in client with previously configured options
 
         SignInButton signIn = findViewById(R.id.googleAuth);
+//        TextView textView = (TextView) signIn.getChildAt(0);
+//        textView.setText(R.string.google_button);
+
         signIn.setOnClickListener(view -> signIn()); // on sign in button click, start google sign in
     }
 
@@ -51,11 +53,11 @@ public class AuthActivity extends AppCompatActivity {
      public void onStart() {
         super.onStart();
         // check for and redirect signed in users
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            startActivity(new Intent(AuthActivity.this, SplashActivity.class));
-            finish();
-        }
+//        FirebaseUser currentUser = mAuth.getCurrentUser();
+//        if (currentUser != null) {
+//            startActivity(new Intent(AuthActivity.this, SplashActivity.class));
+//            finish();
+//        }
     }
 
     // google sign in

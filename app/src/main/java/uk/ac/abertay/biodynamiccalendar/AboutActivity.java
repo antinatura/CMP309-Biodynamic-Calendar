@@ -1,6 +1,7 @@
 package uk.ac.abertay.biodynamiccalendar;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.text.HtmlCompat;
 
 import android.os.Bundle;
 import android.text.Html;
@@ -16,10 +17,10 @@ public class AboutActivity extends AppCompatActivity {
 
         // get TextView and set text to HTML formatted about string
         TextView aboutTextView = findViewById(R.id.about);
-        aboutTextView.setText(Html.fromHtml(getString(R.string.about)));
+        aboutTextView.setText(HtmlCompat.fromHtml(getString(R.string.about), HtmlCompat.FROM_HTML_MODE_LEGACY));
     }
 
-    // return home if home button is clicked
+    // click on the home icon
     public void clickReturn(View view) {
         finish();
     }
