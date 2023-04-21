@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -42,7 +41,7 @@ public class SplashActivity extends AppCompatActivity {
 
         // get location (maybe)
         // check connectivity
-        // fix deprecated methods?
+        // fix deprecated methods (in auth, locale and )
         // check what happens to alarm upon restart etc
         // app icon
 

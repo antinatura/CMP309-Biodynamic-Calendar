@@ -46,19 +46,15 @@
         android:onClick="clickHelp"
         android:orientation="horizontal">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/icon_help"
-            android:padding="12dp"/>
-
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="13dp"
             android:layout_weight="1"
-            android:padding="12dp"
-            android:text="@string/help" />
+            android:text="@string/help"
+            app:drawableLeftCompat="@drawable/icon_help"
+            android:drawablePadding="40dp"/>
+
     </LinearLayout>
 
     <LinearLayout
@@ -90,8 +86,6 @@
         android:minHeight="48dp"
         android:orientation="horizontal">
 
-        <!-- change language icon? -->
-
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -103,7 +97,8 @@
             android:layout_width="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_height="wrap_content"
-            android:theme="@style/spinnerTheme"/>
+            android:minHeight="48dp"
+            android:theme="@style/spinnerTheme" />
 
     </LinearLayout>
 
@@ -115,19 +110,14 @@
         android:onClick="clickSignout"
         android:orientation="horizontal">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/icon_signout"
-            android:padding="12dp"/>
-
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="13dp"
             android:layout_weight="1"
-            android:padding="12dp"
-            android:text="@string/sign_out" />
+            android:text="@string/sign_out"
+            app:drawableLeftCompat="@drawable/icon_signout"
+            android:drawablePadding="40dp"/>
     </LinearLayout>
 
 </LinearLayout>
