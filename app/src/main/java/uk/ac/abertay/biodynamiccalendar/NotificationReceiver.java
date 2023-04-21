@@ -70,7 +70,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         Notification.Builder builder = new Notification.Builder(context, "DAILY")
                 .setContentTitle(context.getString(R.string.notif_title))
                 .setContentText(text.get())
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.ic_daily)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent);
 

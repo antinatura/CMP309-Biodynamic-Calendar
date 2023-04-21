@@ -43,7 +43,6 @@ public class SplashActivity extends AppCompatActivity {
         // check connectivity
         // fix deprecated methods (in auth, locale and )
         // check what happens to alarm upon restart etc
-        // app icon
 
         mAuth = FirebaseAuth.getInstance();
 

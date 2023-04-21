@@ -259,6 +259,7 @@ public class MainActivity extends AppCompatActivity {
             calendar.set(Calendar.HOUR_OF_DAY, 11);
             calendar.set(Calendar.MINUTE, 28);
             calendar.set(Calendar.SECOND, 0);
+//            calendar.add(Calendar.MINUTE, 2); // for testing
 
             alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent); // set daily repeating notifications
 
