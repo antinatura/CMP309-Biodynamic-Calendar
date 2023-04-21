@@ -67,7 +67,7 @@ class LabelDay implements Runnable {
 
     // finds day types based on constellation returned by the API
     private void parseResponse(String constValue){
-        String[] constArray = {"Capricornus","Taurus", "Virgo", "Gemini", "Libra", "Aquarius", "Pisces", "Scorpius", "Cancer", "Ophiuchus", "Aries", "Sagittarius", "Leo"};
+        String[] constArray = {"Capricornus","Taurus", "Virgo", "Gemini", "Libra", "Aquarius", "Pisces", "Scorpius", "Cancer", "Ophiuchus", "Cetus", "Aries", "Sagittarius", "Leo"};
 
         for (int a = 0; a < constArray.length; a++) {
             Calendar calendar = Calendar.getInstance();
@@ -80,7 +80,7 @@ class LabelDay implements Runnable {
                 } else if (a <= 5) {
                     MainActivity.labelCell(events, calendar, 2);
                     writeToPrefs(2);
-                } else if (a <= 9) {
+                } else if (a <= 10) {
                     MainActivity.labelCell(events, calendar, 3);
                     writeToPrefs(3);
                 } else {

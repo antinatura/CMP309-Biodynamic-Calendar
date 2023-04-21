@@ -41,6 +41,9 @@ public class AuthActivity extends AppCompatActivity {
         gsc = GoogleSignIn.getClient(this, gso); // build a sign in client
 
         SignInButton signIn = findViewById(R.id.googleAuth);
+        // override button text with string resources in case app language does not match system language
+        TextView textView = (TextView) signIn.getChildAt(0);
+        textView.setText(R.string.google_button);
         signIn.setOnClickListener(view -> signIn()); // on sign in button click, start google sign in
     }
 

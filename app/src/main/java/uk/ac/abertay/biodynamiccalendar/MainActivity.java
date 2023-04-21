@@ -18,6 +18,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -44,9 +45,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -105,20 +108,12 @@ public class MainActivity extends AppCompatActivity {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                String lang = adapterView.getItemAtPosition(i).toString();
-
-                if (lang.equals("English")) {
-                    setLocale(MainActivity.this, "en");
-                    startActivity(getIntent());
-                    finish();
-                } else if (lang.equals("Latviešu")) {
-                    setLocale(MainActivity.this, "lv");
-                    startActivity(getIntent());
-                    finish();
-                }
+                langSelection(adapterView.getItemAtPosition(i).toString());
             }
+
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
+
             }
         });
 
@@ -128,11 +123,14 @@ public class MainActivity extends AppCompatActivity {
         List<EventDay> events = Collections.synchronizedList(new ArrayList<>()); // initialise array list to store cell labels
 
         if (rewrite) {
-            Calendar currCal = Calendar.getInstance(); // get current date
-            parseMonth(currCal, events); // parse the current month
+            Calendar calendar = Calendar.getInstance(); // get current date
+            parseMonth(calendar, events); // parse the current month
             // parse the next month
-            currCal.add(Calendar.MONTH, 1);
-            parseMonth(currCal, events);
+            calendar.add(Calendar.MONTH, 1);
+            parseMonth(calendar, events);
+            // parse the previous month
+            calendar.add(Calendar.MONTH, -2);
+            parseMonth(calendar, events);
         } else {
             getEvents(events);
         }
@@ -156,9 +154,10 @@ public class MainActivity extends AppCompatActivity {
 
     // starts threads that will get day types for all days of a month
     private void parseMonth(Calendar calendar, List<EventDay> events) {
-        // get location
-        String latitude = "56.462002";
-        String longitude = "-2.970700";
+        // coordinates
+        // API returns other information about the planets where accurate coordinates are needed but the constellation moon is in does not depend on the observers location so hardcoded values are used to get information the app needs
+        String latitude = "39";
+        String longitude = "34";
 
         String[] dates = formatDate(calendar);
         YearMonth yearMonthObject = YearMonth.of(Integer.parseInt(dates[0]), Integer.parseInt(dates[1])); // month object to determine how many days are in it
@@ -228,9 +227,6 @@ public class MainActivity extends AppCompatActivity {
 
     // notification switch
     public void onSwitchChange (CompoundButton buttonView, boolean isChecked) {
-        // notification channel
-        NotificationChannel channel = new NotificationChannel("DAILY", "Day types", NotificationManager.IMPORTANCE_DEFAULT);
-        channel.setDescription("Channel for daily day type notifications");
 
         // create intents
         Intent intent = new Intent(MainActivity.this, NotificationReceiver.class);
@@ -249,6 +245,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
             sharedPrefs.edit().putBoolean("notifstate", true).apply();
+
+            // notification channel
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            NotificationChannel channel = new NotificationChannel("DAILY", "Day types", NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setDescription("Channel for daily day type notifications");
+            notificationManager.createNotificationChannel(channel);
+
             Calendar calendar = Calendar.getInstance();
             // check if time has already passed
             if (calendar.get(Calendar.HOUR_OF_DAY) >= 10) {
@@ -256,16 +259,19 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // set to 10am
-            calendar.set(Calendar.HOUR_OF_DAY, 10);
-            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.HOUR_OF_DAY, 11);
+            calendar.set(Calendar.MINUTE, 28);
             calendar.set(Calendar.SECOND, 0);
 
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent); // set repeating notifications
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent); // set daily repeating notifications
 
         } else {
             sharedPrefs.edit().putBoolean("notifstate", false).apply();
-            if(alarmManager != null)
-                alarmManager.cancel(pendingIntent); // cancel notifications
+            if(alarmManager != null) {
+                // cancel notifications
+                alarmManager.cancel(pendingIntent);
+                pendingIntent.cancel();
+            }
         }
     }
 
@@ -282,6 +288,27 @@ public class MainActivity extends AppCompatActivity {
             finish();
         });
         builder.show();
+    }
+
+    public void langSelection(String lang) {
+        SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences("biodynamiccalendar_APPSETTINGS", Context.MODE_PRIVATE); // stores language selection
+        String savedLang = sharedPrefs.getString("lang", null);
+
+        if (lang.equals(savedLang)) {
+            return;
+        }
+
+        if (lang.equals("English")) {
+            sharedPrefs.edit().putString("lang", "English").apply();
+            setLocale(MainActivity.this, "en");
+            startActivity(getIntent());
+            finish();
+        } else if (lang.equals("Latviešu")) {
+            sharedPrefs.edit().putString("lang", "Latviešu").apply();
+            setLocale(MainActivity.this, "lv");
+            startActivity(getIntent());
+            finish();
+        }
     }
 
     // change app language

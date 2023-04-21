@@ -25,16 +25,26 @@ public class SplashActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        // fetch language to override system language being used
+        SharedPreferences fetch = getApplicationContext().getSharedPreferences("biodynamiccalendar_APPSETTINGS", Context.MODE_PRIVATE); // stores language selection
+        String savedLang = fetch.getString("lang", null);
+
+        if (!savedLang.isEmpty()) {
+            String code;
+            if (savedLang.equals("English")) {code = "en";}
+            else {code = "lv";}
+            MainActivity.setLocale(SplashActivity.this, code);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        // request perms
+        // get location (maybe)
         // check connectivity
-        // find a way to make locale permanent
         // fix deprecated methods?
+        // check what happens to alarm upon restart etc
         // app icon
-        // other visuals? (notification drawable, more color edits, splash bg)
-        // cetus in array
 
         mAuth = FirebaseAuth.getInstance();
 

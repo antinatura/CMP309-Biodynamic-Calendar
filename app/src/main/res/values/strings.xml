@@ -44,10 +44,10 @@
     <string name="today_is">Today is&#160;</string>
     <string name="full_moon_notif">"Today the moon is full. &#127765; Time for a break! &#128522;"</string>
     <string name="new_moon_notif">"Today the moon is new. &#127761; Time for a break! &#128522;"</string>
-    <string name="root_emoji">&#129365;</string>
-    <string name="flower_emoji">&#127800;</string>
-    <string name="leaf_emoji">&#127811;</string>
-    <string name="fruit_emoji">&#58181;</string>
+    <string name="root_emoji">. &#129365;</string>
+    <string name="flower_emoji">. &#127800;</string>
+    <string name="leaf_emoji">. &#127811;</string>
+    <string name="fruit_emoji">. &#127822;</string>
     <string name="material_calendar_monday">M</string>
     <string name="material_calendar_tuesday">T</string>
     <string name="material_calendar_wednesday">W</string>
