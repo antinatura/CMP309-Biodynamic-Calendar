@@ -8,12 +8,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 @SuppressLint("CustomSplashScreen") // android splash screen API was introduced for android 12 and later, while development environment is lower
@@ -39,14 +45,8 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        // get location (maybe)
-        // check connectivity
-        // fix deprecated methods (in auth, locale and )
-        // check what happens to alarm upon restart etc
-
         mAuth = FirebaseAuth.getInstance();
 
-        // put this in main?
         // gets date from which saved days start
         SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences("biodynamiccalendar_DAYTYPES", Context.MODE_PRIVATE); // get day type shared preferences
         String writeTime = sharedPrefs.getString("written", null);
@@ -60,10 +60,13 @@ public class SplashActivity extends AppCompatActivity {
         } else {
             Map<String, ?> allEntries = sharedPrefs.getAll();
             if (LocalDate.parse(writeTime).isEqual(currentFirst.minusMonths(1)) || allEntries.size() == 1) {
-                // delete preferences and add new start date if a new month has begun since last update or if last update was unsuccessful
-                sharedPrefs.edit().clear().apply();
-                sharedPrefs.edit().putString("written", String.valueOf(currentFirst)).apply();
-                rewrite = true;
+                // check if there is a connection
+                checkConnection(() -> {
+                    // delete preferences and add new start date if a new month has begun since last update or if last update was unsuccessful
+                    sharedPrefs.edit().clear().apply();
+                    sharedPrefs.edit().putString("written", String.valueOf(currentFirst)).apply();
+                    rewrite = true;
+                });
             }
         }
     }
@@ -86,6 +89,25 @@ public class SplashActivity extends AppCompatActivity {
                 finish();
             }
         }, 2000); // after 2 seconds wait time
+    }
+
+    // callback for a successful volley request
+    public interface VolleyCallback {
+        void onResponse();
+    }
+
+    // to check connectivity, check if the API can be reached
+    public void checkConnection(final VolleyCallback callback) {
+        RequestQueue queue = Volley.newRequestQueue(this);
+        // API url, the parameters do not matter
+        String url = "https://api.visibleplanets.dev/v3?latitude=39&longitude=34&showCoords=true&aboveHorizon=false&time=20231231T235959";
+
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                response -> {
+                    callback.onResponse();
+                }, Throwable::printStackTrace);
+        queue.add(stringRequest);
     }
 }
 

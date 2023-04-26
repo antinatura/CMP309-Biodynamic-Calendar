@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
             // parse the previous month
             calendar.add(Calendar.MONTH, -2);
             parseMonth(calendar, events);
+            getIntent().removeExtra("rewrite"); // clear the extra so rewrite does not happen if activity is relaunched (by language change for example)
         } else {
             getEvents(events);
         }
@@ -227,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
 
         // create intents
         Intent intent = new Intent(MainActivity.this, NotificationReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         SharedPreferences sharedPrefs = getApplicationContext().getSharedPreferences("biodynamiccalendar_APPSETTINGS", Context.MODE_PRIVATE); // stores switch state
@@ -256,8 +257,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // set to 10am
-            calendar.set(Calendar.HOUR_OF_DAY, 11);
-            calendar.set(Calendar.MINUTE, 28);
+            calendar.set(Calendar.HOUR_OF_DAY, 10);
+            calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
 //            calendar.add(Calendar.MINUTE, 2); // for testing
 

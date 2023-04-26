@@ -64,13 +64,13 @@ public class NotificationReceiver extends BroadcastReceiver {
         // notification intents
         Intent notifIntent = new Intent(context, SplashActivity.class);
         notifIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notifIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notifIntent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
         // build notification
         Notification.Builder builder = new Notification.Builder(context, "DAILY")
                 .setContentTitle(context.getString(R.string.notif_title))
                 .setContentText(text.get())
-                .setSmallIcon(R.drawable.ic_daily)
+                .setSmallIcon(R.drawable.icon_daily)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent);
 

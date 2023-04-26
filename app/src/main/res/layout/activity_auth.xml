@@ -3,8 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/splash"
+    android:background="@color/green_2"
     tools:context=".AuthActivity">
+
+    <!-- maybe change the dimensions -->
+    <ImageView
+        android:layout_width="400dp"
+        android:layout_height="700dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/splash"/>
 
     <com.google.android.gms.common.SignInButton
         android:layout_width="wrap_content"
@@ -12,5 +20,5 @@
         android:id="@+id/googleAuth"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="175dp"/>
+        android:paddingBottom="15dp"/>
 </RelativeLayout>
