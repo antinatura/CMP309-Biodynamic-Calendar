@@ -3,6 +3,7 @@
     <string name="app_name">Biodinamiskais Kalendārs</string>
     <string name="google_button">Pierakstīties</string>
     <string name="auth_failure">Autentifikācija neveiksmīga!</string>
+    <string name="loading">Ielādē dienas, lūdzu uzgaidiet.</string>
     <string name="help">Par</string>
     <string name="notifs">Ieslēgt Paziņojumus</string>
     <string name="notif_alert">Lūdzu atļauj aplikācijai sūtīt paziņojumus iestatījumos!</string>

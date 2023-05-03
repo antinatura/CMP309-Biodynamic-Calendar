@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -19,8 +18,6 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.time.LocalDate;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 
 @SuppressLint("CustomSplashScreen") // android splash screen API was introduced for android 12 and later, while development environment is lower
 public class SplashActivity extends AppCompatActivity {
@@ -104,9 +101,7 @@ public class SplashActivity extends AppCompatActivity {
 
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                response -> {
-                    callback.onResponse();
-                }, Throwable::printStackTrace);
+                response -> callback.onResponse(), Throwable::printStackTrace);
         queue.add(stringRequest);
     }
 }

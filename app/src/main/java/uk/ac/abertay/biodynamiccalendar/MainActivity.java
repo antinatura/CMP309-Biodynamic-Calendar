@@ -120,6 +120,8 @@ public class MainActivity extends AppCompatActivity {
         List<EventDay> events = Collections.synchronizedList(new ArrayList<>()); // initialise array list to store cell labels
 
         if (rewrite) {
+            Toast.makeText(this, R.string.loading, Toast.LENGTH_LONG).show();
+
             Calendar calendar = Calendar.getInstance(); // get current date
             parseMonth(calendar, events); // parse the current month
             // parse the next month
@@ -128,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
             // parse the previous month
             calendar.add(Calendar.MONTH, -2);
             parseMonth(calendar, events);
+
             getIntent().removeExtra("rewrite"); // clear the extra so rewrite does not happen if activity is relaunched (by language change for example)
         } else {
             getEvents(events);
@@ -260,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
             calendar.set(Calendar.HOUR_OF_DAY, 10);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
-//            calendar.add(Calendar.MINUTE, 2); // for testing
+            calendar.add(Calendar.MINUTE, 1); // for testing
 
             alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent); // set daily repeating notifications
 

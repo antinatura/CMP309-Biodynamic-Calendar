@@ -2,6 +2,7 @@
     <string name="app_name">Biodynamic Calendar</string>
     <string name="google_button">Sign In</string>
     <string name="auth_failure">Authentication failed!</string>
+    <string name="loading">Loading day types, please wait.</string>
     <string name="help">About</string>
     <string name="notifs">Enable Notificatons</string>
     <string name="notif_alert">Please enable notifications for this app in settings!</string>
