@@ -28,11 +28,11 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        // fetch language to override system language being used
+        // fetch language and switch to it
         SharedPreferences fetch = getApplicationContext().getSharedPreferences("biodynamiccalendar_APPSETTINGS", Context.MODE_PRIVATE); // stores language selection
         String savedLang = fetch.getString("lang", null);
 
-        if (!savedLang.isEmpty()) {
+        if (savedLang != null) {
             String code;
             if (savedLang.equals("English")) {code = "en";}
             else {code = "lv";}
