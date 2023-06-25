@@ -43,3 +43,9 @@ consult the module tutor.
 
 
 ##### 2. My implementation
+
+A Biodynamic Calendar application written in Java that helps with the planning of gardening activities
+based on the moons phase and its location in the sky. It determines and displays day types (i.e. leaf,
+flower, fruit, and root days which indicate what plants to focus on during that specific day) based on
+astronomic information and functions as a gardening diary.
+
